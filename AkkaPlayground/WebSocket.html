@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket</title>
+</head>
+<body>
+
+<script type="application/javascript">
+    
+    const host = '192.168.88.203';
+    const port = 443;
+
+    const ws = new WebSocket('ws://' + host + ':' + port);
+
+    ws.onmessage = function(msg) {
+        console.log(JSON.parse(msg.data));
+    }
+    
+</script>
+
+</body>
+</html>
