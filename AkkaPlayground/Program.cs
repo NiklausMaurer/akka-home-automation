@@ -10,6 +10,54 @@ using Akka.Actor;
 
 namespace AkkaPlayground
 {
+    public class LightsActor : ReceiveActor
+    {
+        public LightsActor()
+        {
+            Receive<LightsCommandMessage>(message =>
+            {
+                Console.WriteLine("[Thread {0}, Actor {1}] Message received", Thread.CurrentThread.ManagedThreadId, Self.Path);
+
+                using var httpClient = new HttpClient()
+                {
+                    BaseAddress = new Uri("http://192.168.88.203:9080/api/84594D24F2/")
+                };
+
+                var cancellationTokenSource = new CancellationTokenSource();
+                Task<HttpResponseMessage> task = null;
+                    
+                switch (message.Command)
+                {
+                    case LightsCommandMessage.LightsCommand.TurnOn:
+                        task = httpClient.PutAsync($"lights/{message.LightId}/state", new StringContent("{ \"on\": true }", Encoding.UTF8), cancellationTokenSource.Token);
+                        break;
+                    case LightsCommandMessage.LightsCommand.TurnOff:
+                        task = httpClient.PutAsync($"lights/{message.LightId}/state", new StringContent("{ \"on\": false }", Encoding.UTF8), cancellationTokenSource.Token);
+                        break;
+                    default:
+                        throw new Exception("Command not supported");
+                }
+                
+                Console.WriteLine("[Thread {0}, Actor {1}] Request sent", Thread.CurrentThread.ManagedThreadId, Self.Path);
+                    
+                task?.Wait();
+                if(task != null) Console.WriteLine(task.Result.StatusCode);
+            });
+        }
+    }
+
+    public class LightsCommandMessage
+    {
+        public enum LightsCommand
+        {
+            TurnOn,
+            TurnOff
+        }
+
+        public LightsCommand Command { get; set; }
+        public string LightId { get; set; }
+    }
+
     public class EventActor : ReceiveActor
     {
         public EventActor()
@@ -21,35 +69,24 @@ namespace AkkaPlayground
                 if (message.MessageType != "event" || message.EventType != "changed" ||
                     message.ResourceType != "sensors" ||
                     message.ResourceId != "9") return;
-
-                using var httpClient = new HttpClient()
-                {
-                    BaseAddress = new Uri("http://192.168.88.203:9080/api/84594D24F2/")
-                };
-
-                var cancellationTokenSource = new CancellationTokenSource();
-
+                
                 if (message.ButtonEvent == 1002)
                 {
-                    var task = httpClient.PutAsync("lights/15/state", new StringContent("{ \"on\": false }", Encoding.UTF8),
-                        cancellationTokenSource.Token);
-                    
-                    Console.WriteLine("[Thread {0}, Actor {1}] Request sent", Thread.CurrentThread.ManagedThreadId, Self.Path);
-                    
-                    task.Wait();
+                    Context.System.EventStream.Publish(new LightsCommandMessage
+                    {
+                        LightId = "15",
+                        Command = LightsCommandMessage.LightsCommand.TurnOff
+                    });
                 }
                 else
                 {
-                    var task = httpClient.PutAsync("lights/15/state", new StringContent("{ \"on\": true }", Encoding.UTF8),
-                        cancellationTokenSource.Token);
-                    
-                    Console.WriteLine("[Thread {0}, Actor {1}] Request sent", Thread.CurrentThread.ManagedThreadId, Self.Path);
-                    
-                    task.Wait();
+                    Context.System.EventStream.Publish(new LightsCommandMessage
+                    {
+                        LightId = "15",
+                        Command = LightsCommandMessage.LightsCommand.TurnOn
+                    });
                 }
             });
-            
-            Console.WriteLine("[Thread {0}] Constructor of EventActor terminated", Thread.CurrentThread.ManagedThreadId);
         }
     }
 
@@ -100,18 +137,19 @@ namespace AkkaPlayground
     {
         private static async Task Main()
         {
-            using var webSocket = new ClientWebSocket();
-
-            var cancellationTokenSource = new CancellationTokenSource();
-            await webSocket.ConnectAsync(new Uri("ws://192.168.88.203:443"), cancellationTokenSource.Token);
-
             var system = ActorSystem.Create("playground");
             
             var webSocketMessageActor = system.ActorOf<WebSocketMessageActor>("webSocketMessageActor");
             var eventActor = system.ActorOf<EventActor>("eventActor");
+            var lightsActor = system.ActorOf<LightsActor>("lightsActor");
 
             system.EventStream.Subscribe(webSocketMessageActor, typeof(WebSocketMessage));
             system.EventStream.Subscribe(eventActor, typeof(ButtonEventMessage));
+            system.EventStream.Subscribe(lightsActor, typeof(LightsCommandMessage));
+            
+            using var webSocket = new ClientWebSocket();
+            var cancellationTokenSource = new CancellationTokenSource();
+            await webSocket.ConnectAsync(new Uri("ws://192.168.88.203:443"), cancellationTokenSource.Token);
             
             while (true)
             {
