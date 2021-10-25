@@ -1,8 +1,9 @@
 using System;
 using System.Threading;
 using Akka.Actor;
+using AkkaPlayground.Messages;
 
-namespace AkkaPlayground
+namespace AkkaPlayground.Actors
 {
     public class EventActor : ReceiveActor
     {

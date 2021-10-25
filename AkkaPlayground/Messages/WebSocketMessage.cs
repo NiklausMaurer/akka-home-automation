@@ -1,4 +1,4 @@
-namespace AkkaPlayground
+namespace AkkaPlayground.Messages
 {
     public class WebSocketMessage   
     {

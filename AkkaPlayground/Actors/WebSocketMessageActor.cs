@@ -2,8 +2,9 @@ using System;
 using System.Text.Json;
 using System.Threading;
 using Akka.Actor;
+using AkkaPlayground.Messages;
 
-namespace AkkaPlayground
+namespace AkkaPlayground.Actors
 {
     public class WebSocketMessageActor : ReceiveActor
     {

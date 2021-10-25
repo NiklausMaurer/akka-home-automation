@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Akka.Actor;
+using AkkaPlayground.Actors;
+using AkkaPlayground.Messages;
 
 namespace AkkaPlayground
 {

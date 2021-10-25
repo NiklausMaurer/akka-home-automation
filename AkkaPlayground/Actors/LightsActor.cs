@@ -3,8 +3,9 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using Akka.Actor;
+using AkkaPlayground.Messages;
 
-namespace AkkaPlayground
+namespace AkkaPlayground.Actors
 {
     public class LightsActor : ReceiveActor
     {
