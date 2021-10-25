@@ -14,15 +14,16 @@ namespace EventProcessingService
 {
     public class Worker : BackgroundService
     {
-        private readonly ILogger<Worker> _logger;
+        private ILogger<Worker> Logger { get; }
 
         public Worker(ILogger<Worker> logger)
         {
-            _logger = logger;
+            Logger = logger;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            Logger.Log(LogLevel.Trace, "Initializing Actor System");
             var system = ActorSystem.Create("playground");
             
             var webSocketMessageActor = system.ActorOf<WebSocketMessageActor>("webSocketMessageActor");
@@ -33,10 +34,12 @@ namespace EventProcessingService
             system.EventStream.Subscribe(eventActor, typeof(ButtonEventMessage));
             system.EventStream.Subscribe(lightsActor, typeof(LightsCommandMessage));
             
+            Logger.Log(LogLevel.Trace, "Connecting to WebSocket");
             using var webSocket = new ClientWebSocket();
             var cancellationTokenSource = new CancellationTokenSource();
             await webSocket.ConnectAsync(new Uri("ws://192.168.88.203:443"), cancellationTokenSource.Token);
             
+            Logger.Log(LogLevel.Trace, "Connected. Starting to listen...");
             while (!stoppingToken.IsCancellationRequested)
             {
                 var buffer = new byte[2048];
