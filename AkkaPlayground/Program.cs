@@ -48,6 +48,18 @@ namespace AkkaPlayground
 
     public class LightsCommandMessage
     {
+        public static LightsCommandMessage TurnOn(string lightId) => new LightsCommandMessage
+        {
+            Command = LightsCommand.TurnOn,
+            LightId = lightId
+        };
+        
+        public static LightsCommandMessage TurnOff(string lightId) => new LightsCommandMessage
+        {
+            Command = LightsCommand.TurnOff,
+            LightId = lightId
+        };
+        
         public enum LightsCommand
         {
             TurnOn,
@@ -72,19 +84,11 @@ namespace AkkaPlayground
                 
                 if (message.ButtonEvent == 1002)
                 {
-                    Context.System.EventStream.Publish(new LightsCommandMessage
-                    {
-                        LightId = "15",
-                        Command = LightsCommandMessage.LightsCommand.TurnOff
-                    });
+                    Context.System.EventStream.Publish(LightsCommandMessage.TurnOff("15"));
                 }
                 else
                 {
-                    Context.System.EventStream.Publish(new LightsCommandMessage
-                    {
-                        LightId = "15",
-                        Command = LightsCommandMessage.LightsCommand.TurnOn
-                    });
+                    Context.System.EventStream.Publish(LightsCommandMessage.TurnOn("15"));
                 }
             });
         }
