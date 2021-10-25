@@ -24,11 +24,10 @@ namespace AkkaPlayground
                 };
 
                 var cancellationTokenSource = new CancellationTokenSource();
-                Task<HttpResponseMessage> task;
 
                 var requestUri = $"lights/{message.LightId}/state";
 
-                task = message.Command switch
+                var task = message.Command switch
                 {
                     LightsCommandMessage.LightsCommand.TurnOn => httpClient.PutAsync(requestUri,
                         new StringContent("{ \"on\": true }", Encoding.UTF8), cancellationTokenSource.Token),
