@@ -4,23 +4,23 @@ namespace AkkaPlayground.Messages
     {
         public static LightsCommandMessage TurnOn(string lightId) => new LightsCommandMessage
         {
-            Command = LightsCommand.TurnOn,
+            Action = LightAction.TurnOn,
             LightId = lightId
         };
         
         public static LightsCommandMessage TurnOff(string lightId) => new LightsCommandMessage
         {
-            Command = LightsCommand.TurnOff,
+            Action = LightAction.TurnOff,
             LightId = lightId
         };
         
-        public enum LightsCommand
+        public enum LightAction
         {
             TurnOn,
             TurnOff
         }
 
-        public LightsCommand Command { get; set; }
+        public LightAction Action { get; set; }
         public string LightId { get; set; }
     }
 }

@@ -24,11 +24,11 @@ namespace AkkaPlayground.Actors
 
                 var requestUri = $"lights/{message.LightId}/state";
 
-                var task = message.Command switch
+                var task = message.Action switch
                 {
-                    LightsCommandMessage.LightsCommand.TurnOn => httpClient.PutAsync(requestUri,
+                    LightsCommandMessage.LightAction.TurnOn => httpClient.PutAsync(requestUri,
                         new StringContent("{ \"on\": true }", Encoding.UTF8), cancellationTokenSource.Token),
-                    LightsCommandMessage.LightsCommand.TurnOff => httpClient.PutAsync(requestUri,
+                    LightsCommandMessage.LightAction.TurnOff => httpClient.PutAsync(requestUri,
                         new StringContent("{ \"on\": false }", Encoding.UTF8), cancellationTokenSource.Token),
                     _ => throw new ArgumentOutOfRangeException()
                 };
