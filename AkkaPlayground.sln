@@ -1,7 +1,5 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AkkaPlayground", "AkkaPlayground\AkkaPlayground.csproj", "{155CD443-3F0A-42AA-B849-2DBB99AD8FEA}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventProcessingService", "EventProcessingService\EventProcessingService.csproj", "{985CF4B7-B8F8-49F6-898F-165729BB873D}"
 EndProject
 Global
@@ -10,10 +8,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{155CD443-3F0A-42AA-B849-2DBB99AD8FEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{155CD443-3F0A-42AA-B849-2DBB99AD8FEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{155CD443-3F0A-42AA-B849-2DBB99AD8FEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{155CD443-3F0A-42AA-B849-2DBB99AD8FEA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{985CF4B7-B8F8-49F6-898F-165729BB873D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{985CF4B7-B8F8-49F6-898F-165729BB873D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{985CF4B7-B8F8-49F6-898F-165729BB873D}.Release|Any CPU.ActiveCfg = Release|Any CPU
