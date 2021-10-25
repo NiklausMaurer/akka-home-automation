@@ -57,8 +57,6 @@ namespace AkkaPlayground
     {
         public WebSocketMessageActor()
         {
-            var eventActor = Context.ActorOf<EventActor>("eventActor");
-            
             Receive<WebSocketMessage>(webSocketMessage =>
             {
                 Console.WriteLine("[Thread {0}, Actor {1}] Message received", Thread.CurrentThread.ManagedThreadId, Self.Path);
@@ -78,7 +76,7 @@ namespace AkkaPlayground
 
                 message.ButtonEvent = buttonEvent.GetInt64();
 
-                eventActor.Tell(message);
+                Context.System.EventStream.Publish(message);
                 Console.WriteLine("[Thread {0}, Actor {1}] Message sent", Thread.CurrentThread.ManagedThreadId, Self.Path);
             });
         }
@@ -108,8 +106,13 @@ namespace AkkaPlayground
             await webSocket.ConnectAsync(new Uri("ws://192.168.88.203:443"), cancellationTokenSource.Token);
 
             var system = ActorSystem.Create("playground");
+            
             var webSocketMessageActor = system.ActorOf<WebSocketMessageActor>("webSocketMessageActor");
+            var eventActor = system.ActorOf<EventActor>("eventActor");
 
+            system.EventStream.Subscribe(webSocketMessageActor, typeof(WebSocketMessage));
+            system.EventStream.Subscribe(eventActor, typeof(ButtonEventMessage));
+            
             while (true)
             {
                 var buffer = new byte[2048];
@@ -121,7 +124,9 @@ namespace AkkaPlayground
                     MessageText = Encoding.UTF8.GetString(buffer.Take(receiveResult.Count).ToArray())
                 };
                 
-                webSocketMessageActor.Tell(webSocketMessage);
+                system.EventStream.Publish(webSocketMessage);
+
+                if (cancellationTokenSource.IsCancellationRequested) break;
             }
         }
     }
