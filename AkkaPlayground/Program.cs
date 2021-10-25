@@ -81,15 +81,10 @@ namespace AkkaPlayground
                 if (message.MessageType != "event" || message.EventType != "changed" ||
                     message.ResourceType != "sensors" ||
                     message.ResourceId != "9") return;
-                
-                if (message.ButtonEvent == 1002)
-                {
-                    Context.System.EventStream.Publish(LightsCommandMessage.TurnOff("15"));
-                }
-                else
-                {
-                    Context.System.EventStream.Publish(LightsCommandMessage.TurnOn("15"));
-                }
+
+                Context.System.EventStream.Publish(message.ButtonEvent == 1002
+                    ? LightsCommandMessage.TurnOff("15")
+                    : LightsCommandMessage.TurnOn("15"));
             });
         }
     }
