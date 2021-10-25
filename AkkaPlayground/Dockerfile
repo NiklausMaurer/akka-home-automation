@@ -3,10 +3,10 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
 WORKDIR /src
-COPY ["AkkaPlayground/AkkaPlayground.csproj", "AkkaPlayground/"]
+COPY ["AkkaPlayground.csproj", "AkkaPlayground/"]
 RUN dotnet restore "AkkaPlayground/AkkaPlayground.csproj"
-COPY . .
 WORKDIR "/src/AkkaPlayground"
+COPY . .
 RUN dotnet build "AkkaPlayground.csproj" -c Release -o /app/build
 
 FROM build AS publish
