@@ -8,11 +8,6 @@ using Akka.Actor;
 
 namespace AkkaPlayground
 {
-    public class WebSocketMessage   
-    {
-        public string MessageText { get; set; }
-    }
-
     internal static class Program
     {
         private static async Task Main()
