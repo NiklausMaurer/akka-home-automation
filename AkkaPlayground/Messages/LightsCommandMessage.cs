@@ -2,6 +2,15 @@ namespace AkkaPlayground.Messages
 {
     public class LightsCommandMessage
     {
+        public enum LightAction
+        {
+            TurnOn,
+            TurnOff
+        }
+        
+        public LightAction Action { get; private set; }
+        public string LightId { get; private set; }
+        
         public static LightsCommandMessage TurnOn(string lightId) => new LightsCommandMessage
         {
             Action = LightAction.TurnOn,
@@ -13,14 +22,5 @@ namespace AkkaPlayground.Messages
             Action = LightAction.TurnOff,
             LightId = lightId
         };
-        
-        public enum LightAction
-        {
-            TurnOn,
-            TurnOff
-        }
-
-        public LightAction Action { get; set; }
-        public string LightId { get; set; }
     }
 }
