@@ -39,9 +39,7 @@ namespace EventProcessingService.Actors
                 };
 
                 Console.WriteLine("[Thread {0}, Actor {1}] Request sent", Thread.CurrentThread.ManagedThreadId, Self.Path);
-                    
                 task.Wait(cancellationTokenSource.Token);
-                Console.WriteLine(task.Result.StatusCode);
             }
         }
     }
