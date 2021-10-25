@@ -43,8 +43,6 @@ namespace AkkaPlayground.Actors
                 task?.Wait();
                 if(task != null) Console.WriteLine(task.Result.StatusCode);
             }
-            
-           
         }
     }
 }
