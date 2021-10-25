@@ -14,7 +14,7 @@ namespace AkkaPlayground
     {
         public EventActor()
         {
-            Receive<EventMessage>(message =>
+            Receive<ButtonEventMessage>(message =>
             {
                 Console.WriteLine("[Thread {0}, Actor {1}] Message received", Thread.CurrentThread.ManagedThreadId, Self.Path);
                 
@@ -65,7 +65,7 @@ namespace AkkaPlayground
                 
                 var document = JsonDocument.Parse(webSocketMessage.MessageText);
 
-                EventMessage message = new EventMessage
+                ButtonEventMessage message = new ButtonEventMessage
                 {
                     MessageType = document.RootElement.GetProperty("t").GetString(),
                     EventType = document.RootElement.GetProperty("e").GetString(),
@@ -84,7 +84,7 @@ namespace AkkaPlayground
         }
     }
 
-    public class EventMessage
+    public class ButtonEventMessage
     {
         public string MessageType { get; set; }
         public string EventType { get; set; }
