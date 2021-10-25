@@ -24,20 +24,19 @@ namespace AkkaPlayground
                 };
 
                 var cancellationTokenSource = new CancellationTokenSource();
-                Task<HttpResponseMessage> task = null;
-                    
-                switch (message.Command)
+                Task<HttpResponseMessage> task;
+
+                var requestUri = $"lights/{message.LightId}/state";
+
+                task = message.Command switch
                 {
-                    case LightsCommandMessage.LightsCommand.TurnOn:
-                        task = httpClient.PutAsync($"lights/{message.LightId}/state", new StringContent("{ \"on\": true }", Encoding.UTF8), cancellationTokenSource.Token);
-                        break;
-                    case LightsCommandMessage.LightsCommand.TurnOff:
-                        task = httpClient.PutAsync($"lights/{message.LightId}/state", new StringContent("{ \"on\": false }", Encoding.UTF8), cancellationTokenSource.Token);
-                        break;
-                    default:
-                        throw new Exception("Command not supported");
-                }
-                
+                    LightsCommandMessage.LightsCommand.TurnOn => httpClient.PutAsync(requestUri,
+                        new StringContent("{ \"on\": true }", Encoding.UTF8), cancellationTokenSource.Token),
+                    LightsCommandMessage.LightsCommand.TurnOff => httpClient.PutAsync(requestUri,
+                        new StringContent("{ \"on\": false }", Encoding.UTF8), cancellationTokenSource.Token),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+
                 Console.WriteLine("[Thread {0}, Actor {1}] Request sent", Thread.CurrentThread.ManagedThreadId, Self.Path);
                     
                 task?.Wait();
