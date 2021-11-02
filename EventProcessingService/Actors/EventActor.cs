@@ -20,6 +20,8 @@ namespace EventProcessingService.Actors
                 Context.System.EventStream.Publish(message.ButtonEvent == 1002
                     ? LightsCommandMessage.TurnOff("15")
                     : LightsCommandMessage.TurnOn("15"));
+                
+                Console.WriteLine("[Thread {0}, Actor {1}] Message sent", Thread.CurrentThread.ManagedThreadId, Self.Path);
             });
         }
     }
