@@ -10,26 +10,26 @@ namespace EventProcessingService.Actors
     {
         public EventDispatcher()
         {
-            Receive<string>(webSocketMessage =>
+            Receive<string>(message =>
             {
                 Console.WriteLine("[Thread {0}, Actor {1}] Message received", Thread.CurrentThread.ManagedThreadId, Self.Path);
                 
-                var document = JsonDocument.Parse(webSocketMessage);
+                var messageDocument = JsonDocument.Parse(message);
 
-                ButtonEventMessage message = new ButtonEventMessage
+                ButtonEventMessage buttonEvent = new ButtonEventMessage
                 {
-                    MessageType = document.RootElement.GetProperty("t").GetString(),
-                    EventType = document.RootElement.GetProperty("e").GetString(),
-                    ResourceType = document.RootElement.GetProperty("r").GetString(),
-                    ResourceId = document.RootElement.GetProperty("id").GetString(),
+                    MessageType = messageDocument.RootElement.GetProperty("t").GetString(),
+                    EventType = messageDocument.RootElement.GetProperty("e").GetString(),
+                    ResourceType = messageDocument.RootElement.GetProperty("r").GetString(),
+                    ResourceId = messageDocument.RootElement.GetProperty("id").GetString(),
                 };
 
-                if (!document.RootElement.TryGetProperty("state", out var stateDocument)) return;
-                if (!stateDocument.TryGetProperty("buttonevent", out var buttonEvent)) return;
+                if (!messageDocument.RootElement.TryGetProperty("state", out var stateDocument)) return;
+                if (!stateDocument.TryGetProperty("buttonevent", out var buttonEventText)) return;
 
-                message.ButtonEvent = buttonEvent.GetInt64();
+                buttonEvent.ButtonEvent = buttonEventText.GetInt64();
 
-                Context.System.EventStream.Publish(message);
+                Context.System.EventStream.Publish(buttonEventText);
                 Console.WriteLine("[Thread {0}, Actor {1}] Message sent", Thread.CurrentThread.ManagedThreadId, Self.Path);
             });
         }
