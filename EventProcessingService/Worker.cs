@@ -26,11 +26,10 @@ namespace EventProcessingService
             Logger.Log(LogLevel.Trace, "Initializing Actor System");
             var system = ActorSystem.Create("playground");
             
-            var webSocketMessageActor = system.ActorOf<WebSocketMessageActor>("webSocketMessageActor");
+            var eventDispatcher = system.ActorOf<EventDispatcher>("eventDispatcher");
             var eventActor = system.ActorOf<EventActor>("eventActor");
             var lightsActor = system.ActorOf<LightsActor>("lightsActor");
 
-            system.EventStream.Subscribe(webSocketMessageActor, typeof(WebSocketMessage));
             system.EventStream.Subscribe(eventActor, typeof(ButtonEventMessage));
             system.EventStream.Subscribe(lightsActor, typeof(LightsCommandMessage));
             
@@ -46,12 +45,7 @@ namespace EventProcessingService
                 var memory = new Memory<byte>(buffer);
                 var receiveResult = await webSocket.ReceiveAsync(memory, cancellationTokenSource.Token);
 
-                var webSocketMessage = new WebSocketMessage()
-                {
-                    MessageText = Encoding.UTF8.GetString(buffer.Take(receiveResult.Count).ToArray())
-                };
-                
-                system.EventStream.Publish(webSocketMessage);
+                eventDispatcher.Tell(Encoding.UTF8.GetString(buffer.Take(receiveResult.Count).ToArray()));
             }
         }
     }

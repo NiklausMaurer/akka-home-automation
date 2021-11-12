@@ -6,15 +6,15 @@ using EventProcessingService.Messages;
 
 namespace EventProcessingService.Actors
 {
-    public class WebSocketMessageActor : ReceiveActor
+    public class EventDispatcher : ReceiveActor
     {
-        public WebSocketMessageActor()
+        public EventDispatcher()
         {
-            Receive<WebSocketMessage>(webSocketMessage =>
+            Receive<string>(webSocketMessage =>
             {
                 Console.WriteLine("[Thread {0}, Actor {1}] Message received", Thread.CurrentThread.ManagedThreadId, Self.Path);
                 
-                var document = JsonDocument.Parse(webSocketMessage.MessageText);
+                var document = JsonDocument.Parse(webSocketMessage);
 
                 ButtonEventMessage message = new ButtonEventMessage
                 {
