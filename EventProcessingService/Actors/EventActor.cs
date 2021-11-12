@@ -9,7 +9,7 @@ namespace EventProcessingService.Actors
     {
         public EventActor()
         {
-            Receive<ButtonEventMessage>(message =>
+            Receive<ButtonEvent>(message =>
             {
                 Console.WriteLine("[Thread {0}, Actor {1}] Message received", Thread.CurrentThread.ManagedThreadId, Self.Path);
                 
@@ -17,7 +17,7 @@ namespace EventProcessingService.Actors
                     message.ResourceType != "sensors" ||
                     message.ResourceId != "9") return;
 
-                Context.System.EventStream.Publish(message.ButtonEvent == 1002
+                Context.System.EventStream.Publish(message.Event == 1002
                     ? LightsCommandMessage.TurnOff("15")
                     : LightsCommandMessage.TurnOn("15"));
                 

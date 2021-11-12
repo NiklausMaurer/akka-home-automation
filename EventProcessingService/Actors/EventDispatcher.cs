@@ -16,7 +16,7 @@ namespace EventProcessingService.Actors
                 
                 var messageDocument = JsonDocument.Parse(message);
 
-                ButtonEventMessage buttonEvent = new ButtonEventMessage
+                ButtonEvent buttonEvent = new ButtonEvent
                 {
                     MessageType = messageDocument.RootElement.GetProperty("t").GetString(),
                     EventType = messageDocument.RootElement.GetProperty("e").GetString(),
@@ -27,9 +27,9 @@ namespace EventProcessingService.Actors
                 if (!messageDocument.RootElement.TryGetProperty("state", out var stateDocument)) return;
                 if (!stateDocument.TryGetProperty("buttonevent", out var buttonEventText)) return;
 
-                buttonEvent.ButtonEvent = buttonEventText.GetInt64();
+                buttonEvent.Event = buttonEventText.GetInt64();
 
-                Context.System.EventStream.Publish(buttonEventText);
+                Context.System.EventStream.Publish(buttonEvent);
                 Console.WriteLine("[Thread {0}, Actor {1}] Message sent", Thread.CurrentThread.ManagedThreadId, Self.Path);
             });
         }

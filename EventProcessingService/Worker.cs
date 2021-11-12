@@ -30,7 +30,7 @@ namespace EventProcessingService
             var eventActor = system.ActorOf<EventActor>("eventActor");
             var lightsActor = system.ActorOf<LightsActor>("lightsActor");
 
-            system.EventStream.Subscribe(eventActor, typeof(ButtonEventMessage));
+            system.EventStream.Subscribe(eventActor, typeof(ButtonEvent));
             system.EventStream.Subscribe(lightsActor, typeof(LightsCommandMessage));
             
             Logger.Log(LogLevel.Trace, "Connecting to WebSocket");
