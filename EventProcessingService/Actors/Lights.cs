@@ -7,9 +7,9 @@ using EventProcessingService.Messages.Lights;
 
 namespace EventProcessingService.Actors
 {
-    public class LightsActor : ReceiveActor
+    public class Lights : ReceiveActor
     {
-        public LightsActor()
+        public Lights()
         {
             var httpClient = new HttpClient()
             {

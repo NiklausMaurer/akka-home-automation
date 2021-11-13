@@ -28,7 +28,7 @@ namespace EventProcessingService
             var system = ActorSystem.Create("playground");
             
             var eventDispatcher = system.ActorOf<EventDispatcher>("eventDispatcher");
-            var lightsActor = system.ActorOf<LightsActor>("lightsActor");
+            var lightsActor = system.ActorOf<Lights>("lightsActor");
 
             system.EventStream.Subscribe(lightsActor, typeof(TurnOnCommand));
             system.EventStream.Subscribe(lightsActor, typeof(TurnOffCommand));
