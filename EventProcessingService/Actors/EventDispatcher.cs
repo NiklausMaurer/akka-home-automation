@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using Akka.Actor;
-using EventProcessingService.Messages;
+using EventProcessingService.Messages.Lights;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -50,8 +50,8 @@ namespace EventProcessingService.Actors
                     incomingEvent.ResourceId != "9" || incomingEvent.State is null) return;
 
                 Context.System.EventStream.Publish(incomingEvent.State.ButtonEvent == 1002
-                    ? LightsCommandMessage.TurnOff("15")
-                    : LightsCommandMessage.TurnOn("15"));
+                    ? new TurnOffCommand("15")
+                    : new TurnOnCommand("15"));
                 
                 Console.WriteLine("[Thread {0}, Actor {1}] Message sent", Thread.CurrentThread.ManagedThreadId, Self.Path);
             });

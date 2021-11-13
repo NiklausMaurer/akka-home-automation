@@ -3,44 +3,44 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using Akka.Actor;
-using EventProcessingService.Messages;
+using EventProcessingService.Messages.Lights;
 
 namespace EventProcessingService.Actors
 {
-    public class LightsActor : UntypedActor
+    public class LightsActor : ReceiveActor
     {
-        private static readonly HttpClient HttpClient;
-        
-        static LightsActor()
+        public LightsActor()
         {
-            HttpClient = new HttpClient()
+            var httpClient = new HttpClient()
             {
                 BaseAddress = new Uri("http://192.168.88.203:9080/api/84594D24F2/")
             };
-        }
-
-        protected override void OnReceive(object m)
-        {
-            if (m is LightsCommandMessage message)
+            
+            Receive<TurnOnCommand>(command =>
             {
                 Console.WriteLine("[Thread {0}, Actor {1}] Message received", Thread.CurrentThread.ManagedThreadId, Self.Path);
                 
                 var cancellationTokenSource = new CancellationTokenSource();
+                var requestUri = $"lights/{command.LightId}/state";
 
-                var requestUri = $"lights/{message.LightId}/state";
-
-                var task = message.Action switch
-                {
-                    LightsCommandMessage.LightAction.TurnOn => HttpClient.PutAsync(requestUri,
-                        new StringContent("{ \"on\": true }", Encoding.UTF8), cancellationTokenSource.Token),
-                    LightsCommandMessage.LightAction.TurnOff => HttpClient.PutAsync(requestUri,
-                        new StringContent("{ \"on\": false }", Encoding.UTF8), cancellationTokenSource.Token),
-                    _ => throw new ArgumentOutOfRangeException()
-                };
+                httpClient.PutAsync(requestUri, new StringContent("{ \"on\": true }", Encoding.UTF8),
+                    cancellationTokenSource.Token);
 
                 Console.WriteLine("[Thread {0}, Actor {1}] Request sent", Thread.CurrentThread.ManagedThreadId, Self.Path);
-                task.Wait(cancellationTokenSource.Token);
-            }
+            });
+            
+            Receive<TurnOffCommand>(command =>
+            {
+                Console.WriteLine("[Thread {0}, Actor {1}] Message received", Thread.CurrentThread.ManagedThreadId, Self.Path);
+                
+                var cancellationTokenSource = new CancellationTokenSource();
+                var requestUri = $"lights/{command.LightId}/state";
+
+                httpClient.PutAsync(requestUri, new StringContent("{ \"on\": false }", Encoding.UTF8),
+                    cancellationTokenSource.Token);
+
+                Console.WriteLine("[Thread {0}, Actor {1}] Request sent", Thread.CurrentThread.ManagedThreadId, Self.Path);
+            });
         }
     }
 }

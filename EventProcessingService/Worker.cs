@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Akka.Actor;
 using EventProcessingService.Actors;
 using EventProcessingService.Messages;
+using EventProcessingService.Messages.Lights;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -29,7 +30,8 @@ namespace EventProcessingService
             var eventDispatcher = system.ActorOf<EventDispatcher>("eventDispatcher");
             var lightsActor = system.ActorOf<LightsActor>("lightsActor");
 
-            system.EventStream.Subscribe(lightsActor, typeof(LightsCommandMessage));
+            system.EventStream.Subscribe(lightsActor, typeof(TurnOnCommand));
+            system.EventStream.Subscribe(lightsActor, typeof(TurnOffCommand));
             
             Logger.Log(LogLevel.Trace, "Connecting to WebSocket");
             using var webSocket = new ClientWebSocket();
