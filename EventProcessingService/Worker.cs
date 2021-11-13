@@ -27,10 +27,8 @@ namespace EventProcessingService
             var system = ActorSystem.Create("playground");
             
             var eventDispatcher = system.ActorOf<EventDispatcher>("eventDispatcher");
-            var eventActor = system.ActorOf<EventActor>("eventActor");
             var lightsActor = system.ActorOf<LightsActor>("lightsActor");
 
-            system.EventStream.Subscribe(eventActor, typeof(ButtonEvent));
             system.EventStream.Subscribe(lightsActor, typeof(LightsCommandMessage));
             
             Logger.Log(LogLevel.Trace, "Connecting to WebSocket");

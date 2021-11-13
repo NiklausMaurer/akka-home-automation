@@ -1,11 +1,39 @@
 using System;
-using System.Text.Json;
 using System.Threading;
 using Akka.Actor;
 using EventProcessingService.Messages;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace EventProcessingService.Actors
 {
+    public class IncomingEvent
+    {
+        [JsonProperty("t")]
+        public string MessageType { get; set; }
+        
+        [JsonProperty("e")]
+        public string EventType { get; set; }
+        
+        [JsonProperty("r")]
+        public string ResourceType { get; set; }
+        
+        [JsonProperty("id")]
+        public string ResourceId { get; set; }
+        
+        [JsonProperty("state")]
+        public IncomingEventState State { get; set; }
+    }
+
+    public class IncomingEventState
+    {
+        [JsonProperty("buttonevent")]
+        public int? ButtonEvent { get; set; }
+        
+        [JsonProperty("lastupdated")]
+        public DateTime? LastUpdated { get; set; }
+    }
+    
     public class EventDispatcher : ReceiveActor
     {
         public EventDispatcher()
@@ -14,22 +42,17 @@ namespace EventProcessingService.Actors
             {
                 Console.WriteLine("[Thread {0}, Actor {1}] Message received", Thread.CurrentThread.ManagedThreadId, Self.Path);
                 
-                var messageDocument = JsonDocument.Parse(message);
+                var incomingEvent =  JObject.Parse(message).ToObject<IncomingEvent>();
+                if (incomingEvent == null) throw new Exception($"Parsing of message {message} failed.");
+                
+                if (incomingEvent.MessageType != "event" || incomingEvent.EventType != "changed" ||
+                    incomingEvent.ResourceType != "sensors" ||
+                    incomingEvent.ResourceId != "9" || incomingEvent.State is null) return;
 
-                ButtonEvent buttonEvent = new ButtonEvent
-                {
-                    MessageType = messageDocument.RootElement.GetProperty("t").GetString(),
-                    EventType = messageDocument.RootElement.GetProperty("e").GetString(),
-                    ResourceType = messageDocument.RootElement.GetProperty("r").GetString(),
-                    ResourceId = messageDocument.RootElement.GetProperty("id").GetString(),
-                };
-
-                if (!messageDocument.RootElement.TryGetProperty("state", out var stateDocument)) return;
-                if (!stateDocument.TryGetProperty("buttonevent", out var buttonEventText)) return;
-
-                buttonEvent.Event = buttonEventText.GetInt64();
-
-                Context.System.EventStream.Publish(buttonEvent);
+                Context.System.EventStream.Publish(incomingEvent.State.ButtonEvent == 1002
+                    ? LightsCommandMessage.TurnOff("15")
+                    : LightsCommandMessage.TurnOn("15"));
+                
                 Console.WriteLine("[Thread {0}, Actor {1}] Message sent", Thread.CurrentThread.ManagedThreadId, Self.Path);
             });
         }
