@@ -29,11 +29,11 @@ namespace EventProcessingService
             
             var eventDispatcher = system.ActorOf<EventDispatcher>("eventDispatcher");
             var lights = system.ActorOf<Lights>("lights");
-            var automations = system.ActorOf<Automations>("automations");
+            var automation = system.ActorOf<TurnAllLightsOffAutomation>("turnAllLightsOffAutomation");
             
             system.EventStream.Subscribe(lights, typeof(TurnOnCommand));
             system.EventStream.Subscribe(lights, typeof(TurnOffCommand));
-            system.EventStream.Subscribe(automations, typeof(ButtonEvent));
+            system.EventStream.Subscribe(automation, typeof(ButtonEvent));
             
             Logger.Log(LogLevel.Trace, "Connecting to WebSocket");
             using var webSocket = new ClientWebSocket();

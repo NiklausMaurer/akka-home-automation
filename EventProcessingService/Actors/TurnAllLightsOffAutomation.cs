@@ -3,9 +3,9 @@ using EventProcessingService.Messages.Lights;
 
 namespace EventProcessingService.Actors
 {
-    public class Automations : ReceiveActor
+    public class TurnAllLightsOffAutomation : ReceiveActor
     {
-        public Automations()
+        public TurnAllLightsOffAutomation()
         {
             Receive<ButtonEvent>(buttonEvent =>
             {
