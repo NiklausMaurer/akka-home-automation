@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Configuration;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -20,6 +20,9 @@ namespace EventProcessingService
 {
     public class LightDto
     {
+        [JsonIgnore]
+        public string Id { get; set; }
+        
         [JsonProperty("name")]
         public string Name { get; set; }
 
@@ -49,8 +52,17 @@ namespace EventProcessingService
 
             var content = await response.Content.ReadAsStringAsync(stoppingToken);
             var lightsDocument = JObject.Parse(content);
-            var lightDtos = lightsDocument.ToObject<Dictionary<string, LightDto>>();
-            if (lightDtos is null) throw new Exception("Parsing of lghts failed");
+            var lightDict = lightsDocument.ToObject<Dictionary<string, LightDto>>();
+            if(lightDict is null)  throw new Exception("Lights could not be parsed.");
+            
+            foreach (var keyValuePair in lightDict)
+            {
+                keyValuePair.Value.Id = keyValuePair.Key;
+            }
+
+            var lightDtos = new Collection<LightDto>(lightDict.Values.ToList());
+            
+            if (lightDict is null) throw new Exception("Parsing of lghts failed");
             
             Logger.Log(LogLevel.Trace, "Initializing Actor System");
             var system = ActorSystem.Create("playground");
