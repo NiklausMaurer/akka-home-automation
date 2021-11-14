@@ -47,11 +47,15 @@ namespace EventProcessingService.Actors
                 
                 if (incomingEvent.MessageType != "event" || incomingEvent.EventType != "changed" ||
                     incomingEvent.ResourceType != "sensors" ||
-                    incomingEvent.ResourceId != "9" || incomingEvent.State is null) return;
+                    incomingEvent.State is null) return;
 
-                Context.System.EventStream.Publish(incomingEvent.State.ButtonEvent == 1002
-                    ? new TurnOffCommand("15")
-                    : new TurnOnCommand("15"));
+                if (!incomingEvent.State.ButtonEvent.HasValue) return;
+                
+                Context.System.EventStream.Publish(new ButtonEvent
+                {
+                    ButtonId = incomingEvent.ResourceId,
+                    EventId = incomingEvent.State.ButtonEvent.Value
+                });
                 
                 Console.WriteLine("[Thread {0}, Actor {1}] Message sent", Thread.CurrentThread.ManagedThreadId, Self.Path);
             });

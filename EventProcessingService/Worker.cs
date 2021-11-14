@@ -28,10 +28,12 @@ namespace EventProcessingService
             var system = ActorSystem.Create("playground");
             
             var eventDispatcher = system.ActorOf<EventDispatcher>("eventDispatcher");
-            var lightsActor = system.ActorOf<Lights>("lightsActor");
-
-            system.EventStream.Subscribe(lightsActor, typeof(TurnOnCommand));
-            system.EventStream.Subscribe(lightsActor, typeof(TurnOffCommand));
+            var lights = system.ActorOf<Lights>("lights");
+            var automations = system.ActorOf<Automations>("automations");
+            
+            system.EventStream.Subscribe(lights, typeof(TurnOnCommand));
+            system.EventStream.Subscribe(lights, typeof(TurnOffCommand));
+            system.EventStream.Subscribe(automations, typeof(ButtonEvent));
             
             Logger.Log(LogLevel.Trace, "Connecting to WebSocket");
             using var webSocket = new ClientWebSocket();
