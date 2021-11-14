@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using Akka.Actor;
-using EventProcessingService.Messages.Lights;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
