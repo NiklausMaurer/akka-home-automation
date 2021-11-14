@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Akka.Actor;
 using EventProcessingService.Actors;
-using EventProcessingService.Messages;
 using EventProcessingService.Messages.Lights;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
