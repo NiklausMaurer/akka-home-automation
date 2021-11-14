@@ -1,5 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -9,26 +13,51 @@ using EventProcessingService.Actors;
 using EventProcessingService.Messages.Lights;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace EventProcessingService
 {
+    public class LightDto
+    {
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("type")]
+        public string Type { get; set; }
+    }
+    
     public class Worker : BackgroundService
     {
         private ILogger<Worker> Logger { get; }
-
+        private HttpClient _httpClient;
+        
         public Worker(ILogger<Worker> logger)
         {
             Logger = logger;
+            
+            _httpClient = new HttpClient()
+            {
+                BaseAddress = new Uri("http://192.168.88.203:9080/api/84594D24F2/")
+            };
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            var response = await _httpClient.GetAsync("lights", stoppingToken);
+            if (response.StatusCode != HttpStatusCode.OK) throw new Exception("Getting lights info failed");
+
+            var content = await response.Content.ReadAsStringAsync(stoppingToken);
+            var lightsDocument = JObject.Parse(content);
+            var lightDtos = lightsDocument.ToObject<Dictionary<string, LightDto>>();
+            if (lightDtos is null) throw new Exception("Parsing of lghts failed");
+            
             Logger.Log(LogLevel.Trace, "Initializing Actor System");
             var system = ActorSystem.Create("playground");
             
             var eventDispatcher = system.ActorOf<EventDispatcher>("eventDispatcher");
             var lights = system.ActorOf<Lights>("lights");
-            var automation = system.ActorOf<TurnAllLightsOffAutomation>("turnAllLightsOffAutomation");
+            var automation = system.ActorOf(TurnAllLightsOffAutomation.Props(lightDtos));
             
             system.EventStream.Subscribe(lights, typeof(TurnOnCommand));
             system.EventStream.Subscribe(lights, typeof(TurnOffCommand));
