@@ -62,10 +62,8 @@ namespace EventProcessingService
             var system = ActorSystem.Create("playground");
 
             var eventDispatcher = system.ActorOf<EventDispatcher>("eventDispatcher");
-            var automation = system.ActorOf(TurnAllLightsOffAutomation.Props(lightDtos));
-
-            system.EventStream.Subscribe(automation, typeof(ButtonEvent));
-
+            system.ActorOf(TurnAllLightsOffAutomation.Props(lightDtos));
+            
             Logger.Log(LogLevel.Trace, "Connecting to WebSocket");
             using var webSocket = new ClientWebSocket();
             var cancellationTokenSource = new CancellationTokenSource();

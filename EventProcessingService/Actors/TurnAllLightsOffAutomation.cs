@@ -8,6 +8,8 @@ namespace EventProcessingService.Actors
     {
         public TurnAllLightsOffAutomation(ICollection<LightDto> lights)
         {
+            Context.System.EventStream.Subscribe(Self, typeof(ButtonEvent));
+            
             foreach (var light in lights)
             {
                 if (light.Type.Equals("On/Off plug-in unit")) continue;
