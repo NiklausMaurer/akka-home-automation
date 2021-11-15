@@ -5,9 +5,9 @@ using EventProcessingService.Messages.Events;
 
 namespace EventProcessingService.Actors
 {
-    public class TurnAllLightsOffAutomation : ReceiveActor
+    public class TurnAllLightsOnAutomation : ReceiveActor
     {
-        public TurnAllLightsOffAutomation(ICollection<LightDto> lights)
+        public TurnAllLightsOnAutomation(ICollection<LightDto> lights)
         {
             Context.System.EventStream.Subscribe(Self, typeof(ButtonEvent));
             
@@ -26,18 +26,19 @@ namespace EventProcessingService.Actors
 
         public static Props Props(ICollection<LightDto> lights)
         {
-            return Akka.Actor.Props.Create(() => new TurnAllLightsOffAutomation(lights));
+            return Akka.Actor.Props.Create(() => new TurnAllLightsOnAutomation(lights));
         }
 
         private void ReceiveButtonEvent(ButtonEvent buttonEvent)
         {
             if (buttonEvent.ButtonId != "9") return;
-            if (buttonEvent.EventId != 1002) return;
+            if (buttonEvent.EventId == 1002) return;
 
             foreach (var light in Lights)
             {
-                light.Value.Tell(new TurnOffCommand());
+                light.Value.Tell(new TurnOnCommand());
             }
+            
         }
     }
 }

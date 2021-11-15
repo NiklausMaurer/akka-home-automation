@@ -51,6 +51,7 @@ namespace EventProcessingService
 
             var eventDispatcher = system.ActorOf<EventDispatcher>("eventDispatcher");
             system.ActorOf(TurnAllLightsOffAutomation.Props(lightDtos));
+            system.ActorOf(TurnAllLightsOnAutomation.Props(lightDtos));
             
             Logger.Log(LogLevel.Trace, "Connecting to WebSocket");
             using var webSocket = new ClientWebSocket();
