@@ -44,19 +44,7 @@ namespace EventProcessingService
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            var response = await _httpClient.GetAsync("lights", stoppingToken);
-            if (response.StatusCode != HttpStatusCode.OK) throw new Exception("Getting lights info failed");
-
-            var content = await response.Content.ReadAsStringAsync(stoppingToken);
-            var lightsDocument = JObject.Parse(content);
-            var lightDict = lightsDocument.ToObject<Dictionary<string, LightDto>>();
-            if (lightDict is null) throw new Exception("Lights could not be parsed.");
-
-            foreach (var keyValuePair in lightDict) keyValuePair.Value.Id = keyValuePair.Key;
-
-            var lightDtos = new Collection<LightDto>(lightDict.Values.ToList());
-
-            if (lightDict is null) throw new Exception("Parsing of lghts failed");
+            var lightDtos = await FetchLightDtos(stoppingToken);
 
             Logger.Log(LogLevel.Trace, "Initializing Actor System");
             var system = ActorSystem.Create("playground");
@@ -78,6 +66,24 @@ namespace EventProcessingService
 
                 eventDispatcher.Tell(Encoding.UTF8.GetString(buffer.Take(receiveResult.Count).ToArray()));
             }
+        }
+
+        private async Task<Collection<LightDto>> FetchLightDtos(CancellationToken stoppingToken)
+        {
+            var response = await _httpClient.GetAsync("lights", stoppingToken);
+            if (response.StatusCode != HttpStatusCode.OK) throw new Exception("Getting lights info failed");
+
+            var content = await response.Content.ReadAsStringAsync(stoppingToken);
+            var lightsDocument = JObject.Parse(content);
+            var lightDict = lightsDocument.ToObject<Dictionary<string, LightDto>>();
+            if (lightDict is null) throw new Exception("Lights could not be parsed.");
+
+            foreach (var keyValuePair in lightDict) keyValuePair.Value.Id = keyValuePair.Key;
+
+            var lightDtos = new Collection<LightDto>(lightDict.Values.ToList());
+
+            if (lightDict is null) throw new Exception("Parsing of lghts failed");
+            return lightDtos;
         }
     }
 }
