@@ -32,7 +32,7 @@ namespace EventProcessingService.Actors
         private void ReceiveButtonEvent(ButtonEvent buttonEvent)
         {
             if (buttonEvent.ButtonId != "9") return;
-            if (buttonEvent.EventId == 1002) return;
+            if (buttonEvent.EventId != 2002) return;
 
             foreach (var light in Lights)
             {
