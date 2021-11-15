@@ -23,7 +23,7 @@ namespace EventProcessingService.Actors
                 HttpPut($"lights/{Id}/state", "{ \"on\": true }");
 
                 if (turnOnCommand.Attempt < 3)
-                    Timers.StartSingleTimer("doublecheck", new TurnOnCommand(turnOnCommand.Attempt + 1),
+                    Timers.StartSingleTimer("doublecheck", turnOnCommand.NewAttempt(),
                         TimeSpan.FromMilliseconds(1000));
             });
 
@@ -32,7 +32,7 @@ namespace EventProcessingService.Actors
                 HttpPut($"lights/{Id}/state", "{ \"on\": false }");
 
                 if (turnOffCommand.Attempt < 3)
-                    Timers.StartSingleTimer("doublecheck", new TurnOffCommand(turnOffCommand.Attempt + 1),
+                    Timers.StartSingleTimer("doublecheck", turnOffCommand.NewAttempt(),
                         TimeSpan.FromMilliseconds(1000));
             });
         }

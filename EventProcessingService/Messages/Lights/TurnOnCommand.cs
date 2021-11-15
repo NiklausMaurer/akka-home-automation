@@ -12,5 +12,10 @@ namespace EventProcessingService.Messages.Lights
         }
 
         public int Attempt { get; } = 1;
+
+        public TurnOnCommand NewAttempt()
+        {
+            return new TurnOnCommand(Attempt + 1);
+        }
     }
 }
