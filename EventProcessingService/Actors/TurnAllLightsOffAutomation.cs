@@ -11,7 +11,8 @@ namespace EventProcessingService.Actors
             foreach (var light in lights)
             {
                 if (light.Type.Equals("On/Off plug-in unit")) continue;
-                
+                if (light.Type.Equals("Configuration tool")) continue;
+
                 Lights[light.Id] = Context.ActorOf(Light.Props(light.Id), $"light-{light.Id}");
             }
             

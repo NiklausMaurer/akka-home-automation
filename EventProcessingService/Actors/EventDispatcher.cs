@@ -29,6 +29,9 @@ namespace EventProcessingService.Actors
         [JsonProperty("buttonevent")]
         public int? ButtonEvent { get; set; }
         
+        [JsonProperty("on")]
+        public bool? IsOn { get; set; }
+
         [JsonProperty("lastupdated")]
         public DateTime? LastUpdated { get; set; }
     }
@@ -44,20 +47,38 @@ namespace EventProcessingService.Actors
                 var incomingEvent =  JObject.Parse(message).ToObject<IncomingEvent>();
                 if (incomingEvent == null) throw new Exception($"Parsing of message {message} failed.");
                 
-                if (incomingEvent.MessageType != "event" || incomingEvent.EventType != "changed" ||
-                    incomingEvent.ResourceType != "sensors" ||
+                if (incomingEvent.MessageType != "event" ||
+                    incomingEvent.EventType != "changed" ||
                     incomingEvent.State is null) return;
-
-                if (!incomingEvent.State.ButtonEvent.HasValue) return;
                 
-                Context.System.EventStream.Publish(new ButtonEvent
+                if (incomingEvent.State.ButtonEvent.HasValue)
                 {
-                    ButtonId = incomingEvent.ResourceId,
-                    EventId = incomingEvent.State.ButtonEvent.Value
-                });
+                    Context.System.EventStream.Publish(new ButtonEvent
+                    {
+                        ButtonId = incomingEvent.ResourceId,
+                        EventId = incomingEvent.State.ButtonEvent.Value
+                    });
+                    
+                    Console.WriteLine($"[Thread {Thread.CurrentThread.ManagedThreadId}, Actor {Self.Path}] Buttonevent published.");
+                }
                 
-                Console.WriteLine("[Thread {0}, Actor {1}] Message sent", Thread.CurrentThread.ManagedThreadId, Self.Path);
+                if (incomingEvent.ResourceType.Equals("lights") && incomingEvent.State.IsOn.HasValue)
+                {
+                    Context.System.EventStream.Publish(new LightStateChanged
+                    {
+                        LightId = incomingEvent.ResourceId,
+                        IsOn = incomingEvent.State.IsOn.Value
+                    });
+                    
+                    Console.WriteLine("[Thread {0}, Actor {1}] LightStateChanged published.", Thread.CurrentThread.ManagedThreadId, Self.Path);
+                }
             });
         }
+    }
+
+    public class LightStateChanged
+    {
+        public string LightId { get; set; }
+        public bool IsOn { get; set; }
     }
 }
