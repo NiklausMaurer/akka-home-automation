@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Akka.Actor;
-using EventProcessingService.Messages;
-using EventProcessingService.Messages.Lights;
+using EventProcessingService.Messages.Commands;
+using EventProcessingService.Messages.Events;
 
 namespace EventProcessingService.Actors
 {

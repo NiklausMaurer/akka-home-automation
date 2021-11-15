@@ -1,4 +1,4 @@
-namespace EventProcessingService.Messages.Lights
+namespace EventProcessingService.Messages.Commands
 {
     public class TurnOffCommand
     {

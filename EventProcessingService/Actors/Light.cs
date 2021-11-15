@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using Akka.Actor;
-using EventProcessingService.Messages.Lights;
+using EventProcessingService.Messages.Commands;
 
 namespace EventProcessingService.Actors
 {

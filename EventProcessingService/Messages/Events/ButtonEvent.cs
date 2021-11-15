@@ -1,4 +1,4 @@
-namespace EventProcessingService.Messages
+namespace EventProcessingService.Messages.Events
 {
     public class ButtonEvent
     {
