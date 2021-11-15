@@ -2,20 +2,10 @@ using System;
 using System.Threading;
 using Akka.Actor;
 using EventProcessingService.Dto;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace EventProcessingService.Actors
 {
-    public class IncomingEventState
-    {
-        [JsonProperty("buttonevent")] public int? ButtonEvent { get; set; }
-
-        [JsonProperty("on")] public bool? IsOn { get; set; }
-
-        [JsonProperty("lastupdated")] public DateTime? LastUpdated { get; set; }
-    }
-
     public class EventDispatcher : ReceiveActor
     {
         public EventDispatcher()
