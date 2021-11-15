@@ -10,7 +10,7 @@ namespace EventProcessingService.Actors
         {
             Lights = lights;
 
-            Receive<ButtonEvent>(HandleButtonEvent);
+            Receive<ButtonEvent>(ReceiveButtonEvent);
         }
 
         private ICollection<LightDto> Lights { get; }
@@ -20,7 +20,7 @@ namespace EventProcessingService.Actors
             return Akka.Actor.Props.Create(() => new TurnAllLightsOffAutomation(lights));
         }
 
-        private void HandleButtonEvent(ButtonEvent buttonEvent)
+        private void ReceiveButtonEvent(ButtonEvent buttonEvent)
         {
             if (buttonEvent.ButtonId != "9") return;
 
