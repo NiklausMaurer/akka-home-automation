@@ -6,22 +6,32 @@ namespace EventProcessingService.Actors
 {
     public class TurnAllLightsOffAutomation : ReceiveActor
     {
-        public static Props Props(ICollection<LightDto> lightDtos) =>
-            Akka.Actor.Props.Create(() => new TurnAllLightsOffAutomation(lightDtos));
-
-        public TurnAllLightsOffAutomation(ICollection<LightDto> lightDtos)
+        public TurnAllLightsOffAutomation(ICollection<LightDto> lights)
         {
-            Receive<ButtonEvent>(buttonEvent =>
-            {
-                if (buttonEvent.ButtonId != "9") return;
+            Lights = lights;
 
-                foreach (var lightDto in lightDtos)
-                {
-                    Context.System.EventStream.Publish(buttonEvent.EventId == 1002
-                        ? new TurnOffCommand(lightDto.Id)
-                        : new TurnOnCommand(lightDto.Id));
-                }
-            });
+            Receive<ButtonEvent>(HandleButtonEvent);
+        }
+
+        private ICollection<LightDto> Lights { get; }
+
+        public static Props Props(ICollection<LightDto> lights)
+        {
+            return Akka.Actor.Props.Create(() => new TurnAllLightsOffAutomation(lights));
+        }
+
+        private void HandleButtonEvent(ButtonEvent buttonEvent)
+        {
+            if (buttonEvent.ButtonId != "9") return;
+
+            foreach (var light in Lights)
+            {
+                if (light.Id != "9") continue;
+
+                Context.System.EventStream.Publish(buttonEvent.EventId == 1002
+                    ? new TurnOffCommand(light.Id)
+                    : new TurnOnCommand(light.Id));
+            }
         }
     }
 
