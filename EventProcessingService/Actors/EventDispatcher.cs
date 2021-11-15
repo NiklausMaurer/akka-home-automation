@@ -33,25 +33,7 @@ namespace EventProcessingService.Actors
                     Console.WriteLine(
                         $"[Thread {Thread.CurrentThread.ManagedThreadId}, Actor {Self.Path}] Buttonevent published.");
                 }
-
-                if (incomingEvent.ResourceType.Equals("lights") && incomingEvent.State.IsOn.HasValue)
-                {
-                    Context.System.EventStream.Publish(new LightStateChanged
-                    {
-                        LightId = incomingEvent.ResourceId,
-                        IsOn = incomingEvent.State.IsOn.Value
-                    });
-
-                    Console.WriteLine("[Thread {0}, Actor {1}] LightStateChanged published.",
-                        Thread.CurrentThread.ManagedThreadId, Self.Path);
-                }
             });
         }
-    }
-
-    public class LightStateChanged
-    {
-        public string LightId { get; set; }
-        public bool IsOn { get; set; }
     }
 }
