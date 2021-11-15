@@ -1,24 +1,12 @@
 using System;
 using System.Threading;
 using Akka.Actor;
+using EventProcessingService.Dto;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace EventProcessingService.Actors
 {
-    public class IncomingEvent
-    {
-        [JsonProperty("t")] public string MessageType { get; set; }
-
-        [JsonProperty("e")] public string EventType { get; set; }
-
-        [JsonProperty("r")] public string ResourceType { get; set; }
-
-        [JsonProperty("id")] public string ResourceId { get; set; }
-
-        [JsonProperty("state")] public IncomingEventState State { get; set; }
-    }
-
     public class IncomingEventState
     {
         [JsonProperty("buttonevent")] public int? ButtonEvent { get; set; }
