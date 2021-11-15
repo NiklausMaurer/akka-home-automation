@@ -18,23 +18,31 @@ namespace EventProcessingService.Actors
         {
             Id = id;
 
-            Receive<TurnOnCommand>(turnOnCommand =>
-            {
-                HttpPut($"lights/{Id}/state", "{ \"on\": true }");
+            Receive<TurnOnCommand>(TurnOn);
+            Receive<TurnOffCommand>(TurnOff);
+        }
 
-                if (turnOnCommand.Attempt < 3)
-                    Timers.StartSingleTimer("doublecheck", turnOnCommand.NewAttempt(),
-                        TimeSpan.FromMilliseconds(1000));
-            });
+        private string Id { get; }
 
-            Receive<TurnOffCommand>(turnOffCommand =>
-            {
-                HttpPut($"lights/{Id}/state", "{ \"on\": false }");
 
-                if (turnOffCommand.Attempt < 3)
-                    Timers.StartSingleTimer("doublecheck", turnOffCommand.NewAttempt(),
-                        TimeSpan.FromMilliseconds(1000));
-            });
+        public ITimerScheduler Timers { get; set; }
+
+        private void TurnOn(TurnOnCommand turnOnCommand)
+        {
+            HttpPut($"lights/{Id}/state", "{ \"on\": true }");
+
+            if (turnOnCommand.Attempt < 3)
+                Timers.StartSingleTimer("doublecheck", turnOnCommand.NewAttempt(),
+                    TimeSpan.FromMilliseconds(1000));
+        }
+
+        private void TurnOff(TurnOffCommand turnOffCommand)
+        {
+            HttpPut($"lights/{Id}/state", "{ \"on\": false }");
+
+            if (turnOffCommand.Attempt < 3)
+                Timers.StartSingleTimer("doublecheck", turnOffCommand.NewAttempt(),
+                    TimeSpan.FromMilliseconds(1000));
         }
 
         private void HttpPut(string uri, string body)
@@ -44,9 +52,6 @@ namespace EventProcessingService.Actors
             HttpClient.PutAsync(uri, new StringContent(body, Encoding.UTF8),
                 cancellationTokenSource.Token);
         }
-
-        private string Id { get; }
-        public ITimerScheduler Timers { get; set; }
 
         public static Props Props(string id)
         {
