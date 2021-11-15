@@ -15,7 +15,7 @@ namespace EventProcessingService.Actors
 
                 Lights[light.Id] = Context.ActorOf(Light.Props(light.Id), $"light-{light.Id}");
             }
-            
+
             Receive<ButtonEvent>(ReceiveButtonEvent);
         }
 
@@ -31,9 +31,7 @@ namespace EventProcessingService.Actors
             if (buttonEvent.ButtonId != "9") return;
 
             foreach (var light in Lights)
-            {
                 light.Value.Tell(buttonEvent.EventId == 1002 ? new TurnOffCommand() : new TurnOnCommand());
-            }
         }
     }
 

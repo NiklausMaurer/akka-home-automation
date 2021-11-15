@@ -19,30 +19,28 @@ namespace EventProcessingService
 {
     public class LightDto
     {
-        [JsonIgnore]
-        public string Id { get; set; }
-        
-        [JsonProperty("name")]
-        public string Name { get; set; }
+        [JsonIgnore] public string Id { get; set; }
 
-        [JsonProperty("type")]
-        public string Type { get; set; }
+        [JsonProperty("name")] public string Name { get; set; }
+
+        [JsonProperty("type")] public string Type { get; set; }
     }
-    
+
     public class Worker : BackgroundService
     {
-        private ILogger<Worker> Logger { get; }
-        private HttpClient _httpClient;
-        
+        private readonly HttpClient _httpClient;
+
         public Worker(ILogger<Worker> logger)
         {
             Logger = logger;
-            
-            _httpClient = new HttpClient()
+
+            _httpClient = new HttpClient
             {
                 BaseAddress = new Uri("http://192.168.88.203:9080/api/84594D24F2/")
             };
         }
+
+        private ILogger<Worker> Logger { get; }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -52,30 +50,27 @@ namespace EventProcessingService
             var content = await response.Content.ReadAsStringAsync(stoppingToken);
             var lightsDocument = JObject.Parse(content);
             var lightDict = lightsDocument.ToObject<Dictionary<string, LightDto>>();
-            if(lightDict is null)  throw new Exception("Lights could not be parsed.");
-            
-            foreach (var keyValuePair in lightDict)
-            {
-                keyValuePair.Value.Id = keyValuePair.Key;
-            }
+            if (lightDict is null) throw new Exception("Lights could not be parsed.");
+
+            foreach (var keyValuePair in lightDict) keyValuePair.Value.Id = keyValuePair.Key;
 
             var lightDtos = new Collection<LightDto>(lightDict.Values.ToList());
-            
+
             if (lightDict is null) throw new Exception("Parsing of lghts failed");
-            
+
             Logger.Log(LogLevel.Trace, "Initializing Actor System");
             var system = ActorSystem.Create("playground");
-            
+
             var eventDispatcher = system.ActorOf<EventDispatcher>("eventDispatcher");
             var automation = system.ActorOf(TurnAllLightsOffAutomation.Props(lightDtos));
-            
+
             system.EventStream.Subscribe(automation, typeof(ButtonEvent));
-            
+
             Logger.Log(LogLevel.Trace, "Connecting to WebSocket");
             using var webSocket = new ClientWebSocket();
             var cancellationTokenSource = new CancellationTokenSource();
             await webSocket.ConnectAsync(new Uri("ws://192.168.88.203:443"), cancellationTokenSource.Token);
-            
+
             Logger.Log(LogLevel.Trace, "Connected. Starting to listen...");
             while (!stoppingToken.IsCancellationRequested)
             {
