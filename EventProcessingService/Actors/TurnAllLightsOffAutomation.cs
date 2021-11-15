@@ -8,12 +8,17 @@ namespace EventProcessingService.Actors
     {
         public TurnAllLightsOffAutomation(ICollection<LightDto> lights)
         {
-            Lights = lights;
-
+            foreach (var light in lights)
+            {
+                if (light.Type.Equals("On/Off plug-in unit")) continue;
+                
+                Lights[light.Id] = Context.ActorOf(Light.Props(light.Id), $"light-{light.Id}");
+            }
+            
             Receive<ButtonEvent>(ReceiveButtonEvent);
         }
 
-        private ICollection<LightDto> Lights { get; }
+        private Dictionary<string, IActorRef> Lights { get; } = new();
 
         public static Props Props(ICollection<LightDto> lights)
         {
@@ -26,11 +31,7 @@ namespace EventProcessingService.Actors
 
             foreach (var light in Lights)
             {
-                if (light.Id != "9") continue;
-
-                Context.System.EventStream.Publish(buttonEvent.EventId == 1002
-                    ? new TurnOffCommand(light.Id)
-                    : new TurnOnCommand(light.Id));
+                light.Value.Tell(buttonEvent.EventId == 1002 ? new TurnOffCommand() : new TurnOnCommand());
             }
         }
     }

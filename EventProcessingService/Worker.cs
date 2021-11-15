@@ -10,7 +10,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Akka.Actor;
 using EventProcessingService.Actors;
-using EventProcessingService.Messages.Lights;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -68,11 +67,8 @@ namespace EventProcessingService
             var system = ActorSystem.Create("playground");
             
             var eventDispatcher = system.ActorOf<EventDispatcher>("eventDispatcher");
-            var lights = system.ActorOf<Lights>("lights");
             var automation = system.ActorOf(TurnAllLightsOffAutomation.Props(lightDtos));
             
-            system.EventStream.Subscribe(lights, typeof(TurnOnCommand));
-            system.EventStream.Subscribe(lights, typeof(TurnOffCommand));
             system.EventStream.Subscribe(automation, typeof(ButtonEvent));
             
             Logger.Log(LogLevel.Trace, "Connecting to WebSocket");
