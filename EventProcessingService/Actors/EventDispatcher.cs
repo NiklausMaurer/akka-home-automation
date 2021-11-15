@@ -1,6 +1,7 @@
 using System;
 using Akka.Actor;
 using EventProcessingService.Dto;
+using EventProcessingService.Messages;
 using Newtonsoft.Json.Linq;
 
 namespace EventProcessingService.Actors

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Akka.Actor;
+using EventProcessingService.Messages;
 using EventProcessingService.Messages.Lights;
 
 namespace EventProcessingService.Actors
@@ -35,11 +36,5 @@ namespace EventProcessingService.Actors
             foreach (var light in Lights)
                 light.Value.Tell(buttonEvent.EventId == 1002 ? new TurnOffCommand() : new TurnOnCommand());
         }
-    }
-
-    public class ButtonEvent
-    {
-        public string ButtonId { get; set; }
-        public int EventId { get; set; }
     }
 }
