@@ -20,17 +20,7 @@ namespace EventProcessingService.Actors
 
             Receive<TurnOnCommand>(turnOnCommand =>
             {
-                Console.WriteLine("[Thread {0}, Actor {1}] TurnOnCommand received",
-                    Thread.CurrentThread.ManagedThreadId, Self.Path);
-
-                var cancellationTokenSource = new CancellationTokenSource();
-                var requestUri = $"lights/{Id}/state";
-
-                HttpClient.PutAsync(requestUri, new StringContent("{ \"on\": true }", Encoding.UTF8),
-                    cancellationTokenSource.Token);
-
-                Console.WriteLine("[Thread {0}, Actor {1}] Request to turn on sent",
-                    Thread.CurrentThread.ManagedThreadId, Self.Path);
+                HttpPut($"lights/{Id}/state", "{ \"on\": true }");
 
                 if (turnOnCommand.Attempt < 3)
                     Timers.StartSingleTimer("doublecheck", new TurnOnCommand(turnOnCommand.Attempt + 1),
@@ -39,22 +29,20 @@ namespace EventProcessingService.Actors
 
             Receive<TurnOffCommand>(turnOffCommand =>
             {
-                Console.WriteLine("[Thread {0}, Actor {1}] TurnOffCommand received",
-                    Thread.CurrentThread.ManagedThreadId, Self.Path);
-
-                var cancellationTokenSource = new CancellationTokenSource();
-                var requestUri = $"lights/{Id}/state";
-
-                HttpClient.PutAsync(requestUri, new StringContent("{ \"on\": false }", Encoding.UTF8),
-                    cancellationTokenSource.Token);
-
-                Console.WriteLine("[Thread {0}, Actor {1}] Request to turn off sent",
-                    Thread.CurrentThread.ManagedThreadId, Self.Path);
+                HttpPut($"lights/{Id}/state", "{ \"on\": false }");
 
                 if (turnOffCommand.Attempt < 3)
                     Timers.StartSingleTimer("doublecheck", new TurnOffCommand(turnOffCommand.Attempt + 1),
                         TimeSpan.FromMilliseconds(1000));
             });
+        }
+
+        private void HttpPut(string uri, string body)
+        {
+            var cancellationTokenSource = new CancellationTokenSource();
+
+            HttpClient.PutAsync(uri, new StringContent(body, Encoding.UTF8),
+                cancellationTokenSource.Token);
         }
 
         private string Id { get; }
