@@ -17,7 +17,7 @@ namespace EventProcessingService.Actors
             }
 
             Receive<TurnOn>(TurnOn);
-            Receive<TurnOff>(TurnOff);
+            Receive<TurnLightsOff>(TurnLightsOff);
         }
 
         private Dictionary<string, IActorRef> LightRefs { get; } = new();
@@ -35,7 +35,7 @@ namespace EventProcessingService.Actors
             }
         }
 
-        private void TurnOff(TurnOff turnOff)
+        private void TurnLightsOff(TurnLightsOff turnOff)
         {
             foreach (var light in LightRefs)
             {

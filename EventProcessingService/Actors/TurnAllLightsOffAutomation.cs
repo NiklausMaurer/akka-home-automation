@@ -23,7 +23,7 @@ namespace EventProcessingService.Actors
             if (buttonStateChanged.ButtonId != "9") return;
             if (buttonStateChanged.EventId != 1002) return;
 
-            Context.ActorSelection("/user/lights").Tell(new TurnOff());
+            Context.ActorSelection("/user/lights").Tell(new TurnLightsOff());
         }
     }
 }
