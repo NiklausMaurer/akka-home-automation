@@ -39,7 +39,7 @@ namespace EventProcessingService.Actors
             {
                 foreach (var light in LightRefs)
                 {
-                    light.Value.Tell(new TurnOnCommand());
+                    light.Value.Tell(new TurnOn());
                 }
             }
         }

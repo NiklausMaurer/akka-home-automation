@@ -1,21 +1,21 @@
 namespace EventProcessingService.Messages.Commands
 {
-    public class TurnOnCommand
+    public class TurnOn
     {
-        public TurnOnCommand()
+        public TurnOn()
         {
         }
 
-        public TurnOnCommand(int attempt)
+        public TurnOn(int attempt)
         {
             Attempt = attempt;
         }
 
         public int Attempt { get; } = 1;
 
-        public TurnOnCommand NewAttempt()
+        public TurnOn NewAttempt()
         {
-            return new TurnOnCommand(Attempt + 1);
+            return new TurnOn(Attempt + 1);
         }
     }
 }

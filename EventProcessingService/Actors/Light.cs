@@ -18,7 +18,7 @@ namespace EventProcessingService.Actors
         {
             Id = id;
 
-            Receive<TurnOnCommand>(TurnOn);
+            Receive<TurnOn>(TurnOn);
             Receive<TurnOff>(TurnOff);
         }
 
@@ -27,12 +27,12 @@ namespace EventProcessingService.Actors
 
         public ITimerScheduler Timers { get; set; }
 
-        private void TurnOn(TurnOnCommand turnOnCommand)
+        private void TurnOn(TurnOn turnOn)
         {
             HttpPut($"lights/{Id}/state", "{ \"on\": true }");
 
-            if (turnOnCommand.Attempt < 3)
-                Timers.StartSingleTimer("doublecheck", turnOnCommand.NewAttempt(),
+            if (turnOn.Attempt < 3)
+                Timers.StartSingleTimer("doublecheck", turnOn.NewAttempt(),
                     TimeSpan.FromMilliseconds(1000));
         }
 
