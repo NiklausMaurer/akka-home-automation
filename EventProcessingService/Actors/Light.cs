@@ -19,7 +19,7 @@ namespace EventProcessingService.Actors
             Id = id;
 
             Receive<TurnOnCommand>(TurnOn);
-            Receive<TurnOffCommand>(TurnOff);
+            Receive<TurnOff>(TurnOff);
         }
 
         private string Id { get; }
@@ -36,12 +36,12 @@ namespace EventProcessingService.Actors
                     TimeSpan.FromMilliseconds(1000));
         }
 
-        private void TurnOff(TurnOffCommand turnOffCommand)
+        private void TurnOff(TurnOff turnOff)
         {
             HttpPut($"lights/{Id}/state", "{ \"on\": false }");
 
-            if (turnOffCommand.Attempt < 3)
-                Timers.StartSingleTimer("doublecheck", turnOffCommand.NewAttempt(),
+            if (turnOff.Attempt < 3)
+                Timers.StartSingleTimer("doublecheck", turnOff.NewAttempt(),
                     TimeSpan.FromMilliseconds(1000));
         }
 

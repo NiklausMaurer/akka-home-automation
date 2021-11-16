@@ -32,7 +32,7 @@ namespace EventProcessingService.Actors
             {
                 foreach (var light in LightRefs)
                 {
-                    light.Value.Tell(new TurnOffCommand());
+                    light.Value.Tell(new TurnOff());
                 }
             }
             else

@@ -1,21 +1,21 @@
 namespace EventProcessingService.Messages.Commands
 {
-    public class TurnOffCommand
+    public class TurnOff
     {
-        public TurnOffCommand()
+        public TurnOff()
         {
         }
 
-        public TurnOffCommand(int attempt)
+        public TurnOff(int attempt)
         {
             Attempt = attempt;
         }
 
         public int Attempt { get; } = 1;
         
-        public TurnOffCommand NewAttempt()
+        public TurnOff NewAttempt()
         {
-            return new TurnOffCommand(Attempt + 1);
+            return new TurnOff(Attempt + 1);
         }
     }
 }
