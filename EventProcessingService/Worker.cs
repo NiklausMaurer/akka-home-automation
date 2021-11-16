@@ -46,13 +46,17 @@ namespace EventProcessingService
             await webSocket.ConnectAsync(new Uri("ws://192.168.88.203:443"), cancellationTokenSource.Token);
 
             Logger.Log(LogLevel.Trace, "Connected. Starting to listen...");
+            
+            var buffer = new byte[2048];
+            var memory = new Memory<byte>(buffer);
+            
             while (!stoppingToken.IsCancellationRequested)
             {
-                var buffer = new byte[2048];
-                var memory = new Memory<byte>(buffer);
                 var receiveResult = await webSocket.ReceiveAsync(memory, cancellationTokenSource.Token);
-
-                eventDispatcher.Tell(Encoding.UTF8.GetString(buffer.Take(receiveResult.Count).ToArray()));
+                var messageBytes = buffer.Take(receiveResult.Count).ToArray();
+                var message = Encoding.UTF8.GetString(messageBytes);
+                
+                eventDispatcher.Tell(message);
             }
         }
     }
