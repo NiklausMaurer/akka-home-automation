@@ -1,32 +1,20 @@
-using System.Collections.Generic;
 using Akka.Actor;
-using EventProcessingService.Messages.Commands;
 using EventProcessingService.Messages.Events;
 
 namespace EventProcessingService.Actors
 {
     public class TurnAllLightsOffAutomation : ReceiveActor
     {
-        public TurnAllLightsOffAutomation(ICollection<LightDto> lights)
+        public TurnAllLightsOffAutomation()
         {
             Context.System.EventStream.Subscribe(Self, typeof(ButtonEvent));
             
-            foreach (var light in lights)
-            {
-                if (light.Type.Equals("On/Off plug-in unit")) continue;
-                if (light.Type.Equals("Configuration tool")) continue;
-
-                Lights[light.Id] = Context.ActorOf(Light.Props(light.Id), $"light-{light.Id}");
-            }
-
             Receive<ButtonEvent>(ReceiveButtonEvent);
         }
-
-        private Dictionary<string, IActorRef> Lights { get; } = new();
-
-        public static Props Props(ICollection<LightDto> lights)
+        
+        public static Props Props()
         {
-            return Akka.Actor.Props.Create(() => new TurnAllLightsOffAutomation(lights));
+            return Akka.Actor.Props.Create(() => new TurnAllLightsOffAutomation());
         }
 
         private void ReceiveButtonEvent(ButtonEvent buttonEvent)
@@ -34,10 +22,10 @@ namespace EventProcessingService.Actors
             if (buttonEvent.ButtonId != "9") return;
             if (buttonEvent.EventId != 1002) return;
 
-            foreach (var light in Lights)
+            Context.ActorSelection("/user/lights").Tell(new LightsAction
             {
-                light.Value.Tell(new TurnOffCommand());
-            }
+                Type = LightsActionType.TurnOff
+            });
         }
     }
 }
