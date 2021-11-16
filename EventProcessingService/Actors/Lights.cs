@@ -16,7 +16,8 @@ namespace EventProcessingService.Actors
                 LightRefs[light.Id] = Context.ActorOf(Light.Props(light.Id), $"light-{light.Id}");
             }
 
-            Receive<LightsAction>(ReceiveLightsAction);
+            Receive<TurnOn>(TurnOn);
+            Receive<TurnOff>(TurnOff);
         }
 
         private Dictionary<string, IActorRef> LightRefs { get; } = new();
@@ -26,33 +27,20 @@ namespace EventProcessingService.Actors
             return Akka.Actor.Props.Create(() => new Lights(lights));
         }
 
-        private void ReceiveLightsAction(LightsAction action)
+        private void TurnOn(TurnOn turnOn)
         {
-            if (action.Type == LightsActionType.TurnOff)
+            foreach (var light in LightRefs)
             {
-                foreach (var light in LightRefs)
-                {
-                    light.Value.Tell(new TurnOff());
-                }
-            }
-            else
-            {
-                foreach (var light in LightRefs)
-                {
-                    light.Value.Tell(new TurnOn());
-                }
+                light.Value.Tell(new TurnOn());
             }
         }
-    }
 
-    public enum LightsActionType
-    {
-        TurnOn,
-        TurnOff
-    }
-    
-    public class LightsAction
-    {
-        public LightsActionType Type;
+        private void TurnOff(TurnOff turnOff)
+        {
+            foreach (var light in LightRefs)
+            {
+                light.Value.Tell(new TurnOff());
+            }
+        }
     }
 }
