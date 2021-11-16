@@ -21,7 +21,7 @@ namespace EventProcessingService.Actors
 
                 if (incomingEvent.State.ButtonEvent.HasValue)
                 {
-                    Context.System.EventStream.Publish(new ButtonEvent
+                    Context.System.EventStream.Publish(new ButtonStateChanged
                     {
                         ButtonId = incomingEvent.ResourceId,
                         EventId = incomingEvent.State.ButtonEvent.Value

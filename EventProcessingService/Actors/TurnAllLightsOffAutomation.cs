@@ -7,9 +7,9 @@ namespace EventProcessingService.Actors
     {
         public TurnAllLightsOffAutomation()
         {
-            Context.System.EventStream.Subscribe(Self, typeof(ButtonEvent));
+            Context.System.EventStream.Subscribe(Self, typeof(ButtonStateChanged));
             
-            Receive<ButtonEvent>(ReceiveButtonEvent);
+            Receive<ButtonStateChanged>(ReceiveButtonEvent);
         }
         
         public static Props Props()
@@ -17,10 +17,10 @@ namespace EventProcessingService.Actors
             return Akka.Actor.Props.Create(() => new TurnAllLightsOffAutomation());
         }
 
-        private void ReceiveButtonEvent(ButtonEvent buttonEvent)
+        private void ReceiveButtonEvent(ButtonStateChanged buttonStateChanged)
         {
-            if (buttonEvent.ButtonId != "9") return;
-            if (buttonEvent.EventId != 1002) return;
+            if (buttonStateChanged.ButtonId != "9") return;
+            if (buttonStateChanged.EventId != 1002) return;
 
             Context.ActorSelection("/user/lights").Tell(new LightsAction
             {
