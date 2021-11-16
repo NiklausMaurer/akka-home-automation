@@ -16,7 +16,7 @@ namespace EventProcessingService.Actors
                 LightRefs[light.Id] = Context.ActorOf(Light.Props(light.Id), $"light-{light.Id}");
             }
 
-            Receive<TurnOn>(TurnOn);
+            Receive<TurnLightsOn>(TurnLightsOn);
             Receive<TurnLightsOff>(TurnLightsOff);
         }
 
@@ -27,7 +27,7 @@ namespace EventProcessingService.Actors
             return Akka.Actor.Props.Create(() => new Lights(lights));
         }
 
-        private void TurnOn(TurnOn turnOn)
+        private void TurnLightsOn(TurnLightsOn turnOn)
         {
             foreach (var light in LightRefs)
             {
