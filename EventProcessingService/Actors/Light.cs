@@ -58,8 +58,4 @@ namespace EventProcessingService.Actors
             return Akka.Actor.Props.Create(() => new Light(id));
         }
     }
-
-    public class DoubleCheck
-    {
-    }
 }
