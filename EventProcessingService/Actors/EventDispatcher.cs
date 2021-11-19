@@ -16,7 +16,9 @@ namespace EventProcessingService.Actors
                 if (incomingEvent == null) throw new Exception($"Parsing of message {message} failed.");
 
                 if (incomingEvent.MessageType != "event" ||
-                    incomingEvent.EventType != "changed") return;
+                    incomingEvent.EventType != "changed" ||
+                    incomingEvent.State is null ||
+                    !incomingEvent.State.ButtonEvent.HasValue) return;
 
                 if (incomingEvent.State.ButtonEvent.HasValue)
                 {
