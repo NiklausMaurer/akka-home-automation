@@ -9,22 +9,18 @@ namespace EventProcessingService.Actors
 {
     public class Light : ReceiveActor, IWithTimers
     {
-        private static readonly HttpClient HttpClient = new()
-        {
-            BaseAddress = new Uri("http://192.168.88.203:9080/api/84594D24F2/")
-        };
-
-        public Light(string id)
+        public Light(string id, IHttpClientFactory httpClientFactory)
         {
             Id = id;
+            HttpClientFactory = httpClientFactory;
 
             Receive<TurnOn>(TurnOn);
             Receive<TurnOff>(TurnOff);
         }
 
         private string Id { get; }
-
-
+        private IHttpClientFactory HttpClientFactory { get; }
+        
         public ITimerScheduler Timers { get; set; }
 
         private void TurnOn(TurnOn turnOn)
@@ -49,13 +45,14 @@ namespace EventProcessingService.Actors
         {
             var cancellationTokenSource = new CancellationTokenSource();
 
-            HttpClient.PutAsync(uri, new StringContent(body, Encoding.UTF8),
+            var client = HttpClientFactory.CreateClient("deconz");
+            client.PutAsync(uri, new StringContent(body, Encoding.UTF8),
                 cancellationTokenSource.Token);
         }
 
-        public static Props Props(string id)
+        public static Props Props(string id, IHttpClientFactory httpClientFactory)
         {
-            return Akka.Actor.Props.Create(() => new Light(id));
+            return Akka.Actor.Props.Create(() => new Light(id, httpClientFactory));
         }
     }
 }
