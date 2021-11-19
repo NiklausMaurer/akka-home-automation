@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Akka.Actor;
+using Akka.DependencyInjection;
 using EventProcessingService.Actors;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -23,22 +24,28 @@ namespace EventProcessingService
 
     public class WebSocketListener : BackgroundService
     {
-        public WebSocketListener(ILogger<WebSocketListener> logger)
+        public WebSocketListener(IServiceProvider serviceProvider, ILogger<WebSocketListener> logger)
         {
+            ServiceProvider = serviceProvider;
             Logger = logger;
         }
 
+        private IServiceProvider ServiceProvider { get; }
         private ILogger<WebSocketListener> Logger { get; }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             Logger.Log(LogLevel.Trace, "Initializing Actor System");
-            var system = ActorSystem.Create("playground");
+            
+            var di = DependencyResolverSetup.Create(ServiceProvider);
+            var system = ActorSystem.Create("playground", BootstrapSetup.Create().And(di));
 
             var eventDispatcher = system.ActorOf<EventDispatcher>("eventDispatcher");
             system.ActorOf(TurnAllLightsOffAutomation.Props());
             system.ActorOf(TurnAllLightsOnAutomation.Props());
-            system.ActorOf(Lights.Props(stoppingToken), "lights");
+
+            var props = DependencyResolver.For(system).Props<Lights>();
+            system.ActorOf(props, "lights");
 
             Logger.Log(LogLevel.Trace, "Connecting to WebSocket");
             using var webSocket = new ClientWebSocket();

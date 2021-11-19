@@ -13,24 +13,21 @@ namespace EventProcessingService.Actors
 {
     public class Lights : ReceiveActor
     {
-        private static HttpClient _httpClient;
+        private IHttpClientFactory HttpClientFactory { get; }
 
-        public Lights(CancellationToken cancellationToken)
+        public Lights(IHttpClientFactory httpClientFactory)
         {
-            _httpClient = new HttpClient
-            {
-                BaseAddress = new Uri("http://192.168.88.203:9080/api/84594D24F2/")
-            };
+            HttpClientFactory = httpClientFactory;
             
-            var lights = FetchLightDtos(cancellationToken);
+            var lights = FetchLights(CancellationToken.None);
             
-            foreach (var light in lights)
-            {
-                if (light.Type.Equals("On/Off plug-in unit")) continue;
-                if (light.Type.Equals("Configuration tool")) continue;
-
-                LightRefs[light.Id] = Context.ActorOf(Light.Props(light.Id), $"light-{light.Id}");
-            }
+             foreach (var light in lights)
+             {
+                 if (light.Type.Equals("On/Off plug-in unit")) continue;
+                 if (light.Type.Equals("Configuration tool")) continue;
+            
+                 LightRefs[light.Id] = Context.ActorOf(Light.Props(light.Id), $"light-{light.Id}");
+             }
 
             Receive<TurnLightsOn>(TurnLightsOn);
             Receive<TurnLightsOff>(TurnLightsOff);
@@ -38,15 +35,15 @@ namespace EventProcessingService.Actors
 
         private Dictionary<string, IActorRef> LightRefs { get; } = new();
 
-        public static Props Props(CancellationToken cancellationToken)
+        public static Props Props(IHttpClientFactory httpClientFactory)
         {
-            return Akka.Actor.Props.Create(() => new Lights(cancellationToken));
+            return Akka.Actor.Props.Create(() => new Lights( httpClientFactory));
         }
 
         private void TurnLightsOn(TurnLightsOn turnOn)
         {
             foreach (var light in LightRefs)
-            {
+            {   
                 light.Value.Tell(new TurnOn());
             }
         }
@@ -59,9 +56,10 @@ namespace EventProcessingService.Actors
             }
         }
         
-        private Collection<LightDto> FetchLightDtos(CancellationToken stoppingToken)
+        private Collection<LightDto> FetchLights(CancellationToken stoppingToken)
         {
-            var getAsyncTask = _httpClient.GetAsync("lights", stoppingToken);
+            var client = HttpClientFactory.CreateClient("deconz");
+            var getAsyncTask = client.GetAsync("lights", stoppingToken);
             var response = getAsyncTask .GetAwaiter().GetResult();
             if (response.StatusCode != HttpStatusCode.OK) throw new Exception("Getting lights info failed");
 
@@ -74,10 +72,10 @@ namespace EventProcessingService.Actors
 
             foreach (var keyValuePair in lightDict) keyValuePair.Value.Id = keyValuePair.Key;
 
-            var lightDtos = new Collection<LightDto>(lightDict.Values.ToList());
+            var lights = new Collection<LightDto>(lightDict.Values.ToList());
 
             if (lightDict is null) throw new Exception("Parsing of lghts failed");
-            return lightDtos;
+            return lights;
         }
     }
 }

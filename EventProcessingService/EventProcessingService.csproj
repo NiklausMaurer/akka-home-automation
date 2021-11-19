@@ -4,7 +4,7 @@
         <TargetFramework>net5.0</TargetFramework>
         <UserSecretsId>dotnet-EventProcessingService-F9E506B6-1ECF-4326-AB01-B6BEDF6407C1</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-        <LangVersion>10</LangVersion>
+        <LangVersion>9</LangVersion>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 

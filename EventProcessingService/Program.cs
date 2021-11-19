@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -13,8 +14,13 @@ namespace EventProcessingService
         private static IHostBuilder CreateHostBuilder(string[] args)
         {
             return Host.CreateDefaultBuilder(args)
-                .ConfigureServices((_, services) => { services.AddHostedService<WebSocketListener>()
-                    .Addhtt; });
+                .ConfigureServices((_, services) => { 
+                    services.AddHostedService<WebSocketListener>();
+                    services.AddHttpClient("deconz", client =>
+                    {
+                        client.BaseAddress = new Uri("http://192.168.88.203:9080/api/84594D24F2/");
+                    });
+                });
         }
     }
 }
