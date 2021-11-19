@@ -16,16 +16,12 @@ namespace EventProcessingService.Actors
                 if (incomingEvent == null) throw new Exception($"Parsing of message {message} failed.");
 
                 if (incomingEvent.MessageType != "event" ||
-                    incomingEvent.EventType != "changed" ||
-                    incomingEvent.State is null) return;
+                    incomingEvent.EventType != "changed") return;
 
                 if (incomingEvent.State.ButtonEvent.HasValue)
                 {
-                    Context.System.EventStream.Publish(new ButtonStateChanged
-                    {
-                        ButtonId = incomingEvent.ResourceId,
-                        EventId = incomingEvent.State.ButtonEvent.Value
-                    });
+                    Context.System.EventStream.Publish(new ButtonStateChanged(incomingEvent.ResourceId,
+                        incomingEvent.State.ButtonEvent.Value));
                 }
             });
         }
