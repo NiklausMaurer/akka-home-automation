@@ -5,6 +5,15 @@ namespace EventProcessingService.Dto
 {
     public class IncomingEvent
     {
+        public IncomingEvent(string messageType, string eventType, string resourceType, string resourceId, IncomingEventState state)
+        {
+            MessageType = messageType;
+            EventType = eventType;
+            ResourceType = resourceType;
+            ResourceId = resourceId;
+            State = state;
+        }
+
         [JsonProperty("t")] public string MessageType { get; set; }
 
         [JsonProperty("e")] public string EventType { get; set; }
