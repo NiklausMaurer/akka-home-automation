@@ -19,6 +19,7 @@ namespace EventProcessingService
                     services.AddHttpClient("deconz", client =>
                     {
                         client.BaseAddress = new Uri("http://192.168.88.203:9080/api/84594D24F2/");
+                        client.Timeout = TimeSpan.FromMilliseconds(100);
                     });
                 });
         }
