@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using Akka.Actor;
+using Akka.DependencyInjection;
 using EventProcessingService.Messages.Commands;
 using Newtonsoft.Json.Linq;
 
@@ -26,7 +27,8 @@ namespace EventProcessingService.Actors
                  if (light.Type.Equals("On/Off plug-in unit")) continue;
                  if (light.Type.Equals("Configuration tool")) continue;
             
-                 LightRefs[light.Id] = Context.ActorOf(Light.Props(light.Id), $"light-{light.Id}");
+                 var props = DependencyResolver.For(Context.System).Props<Light>(light.Id);
+                 LightRefs[light.Id] = Context.ActorOf(props, $"light-{light.Id}");
              }
 
             Receive<TurnLightsOn>(TurnLightsOn);
