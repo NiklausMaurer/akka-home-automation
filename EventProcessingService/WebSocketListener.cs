@@ -21,14 +21,14 @@ namespace EventProcessingService
         [JsonProperty("type")] public string Type { get; set; }
     }
 
-    public class Worker : BackgroundService
+    public class WebSocketListener : BackgroundService
     {
-        public Worker(ILogger<Worker> logger)
+        public WebSocketListener(ILogger<WebSocketListener> logger)
         {
             Logger = logger;
         }
 
-        private ILogger<Worker> Logger { get; }
+        private ILogger<WebSocketListener> Logger { get; }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {

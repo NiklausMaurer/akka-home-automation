@@ -13,7 +13,7 @@ namespace EventProcessingService
         private static IHostBuilder CreateHostBuilder(string[] args)
         {
             return Host.CreateDefaultBuilder(args)
-                .ConfigureServices((_, services) => { services.AddHostedService<Worker>(); });
+                .ConfigureServices((_, services) => { services.AddHostedService<WebSocketListener>(); });
         }
     }
 }
