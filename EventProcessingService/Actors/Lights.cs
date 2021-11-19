@@ -25,6 +25,7 @@ namespace EventProcessingService.Actors
             foreach (var light in lightDtos)
             {
                  var lightModel = new Models.Light(light.Id);
+                 lightModel.AddLabel("id", light.Id);
                  if(light.Type.ToLower().Contains("light")) lightModel.AddLabel("type", "light");
                  if(light.Type.ToLower().Contains("plug")) lightModel.AddLabel("type", "plug");
                  LightModels.Add(lightModel);
@@ -47,17 +48,17 @@ namespace EventProcessingService.Actors
 
         private void TurnLightsOn(TurnLightsOn turnOn)
         {
-            foreach (var light in LightModels)
-            {   
-                if(light.HasLabel("type", "light")) LightRefs[light.Id].Tell(new TurnOn());
+            foreach (var light in turnOn.Selector.Select(LightModels))
+            {
+                LightRefs[light.Id].Tell(new TurnOn());
             }
         }
 
         private void TurnLightsOff(TurnLightsOff turnOff)
         {
-            foreach (var light in LightModels)
+            foreach (var light in turnOff.Selector.Select(LightModels))
             {   
-                if(light.HasLabel("type", "light")) LightRefs[light.Id].Tell(new TurnOff());
+                LightRefs[light.Id].Tell(new TurnOff());
             }
         }
         

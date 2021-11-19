@@ -21,14 +21,14 @@ namespace EventProcessingService.Actors
         private string Id { get; }
         private IHttpClientFactory HttpClientFactory { get; }
         
-        public ITimerScheduler Timers { get; set; }
+        public ITimerScheduler? Timers { get; set; }
 
         private void TurnOn(TurnOn turnOn)
         {
             HttpPut($"lights/{Id}/state", "{ \"on\": true }");
 
             if (turnOn.Attempt < 3)
-                Timers.StartSingleTimer("doublecheck", turnOn.NewAttempt(),
+                Timers?.StartSingleTimer("doublecheck", turnOn.NewAttempt(),
                     TimeSpan.FromMilliseconds(1000));
         }
 
@@ -37,7 +37,7 @@ namespace EventProcessingService.Actors
             HttpPut($"lights/{Id}/state", "{ \"on\": false }");
 
             if (turnOff.Attempt < 3)
-                Timers.StartSingleTimer("doublecheck", turnOff.NewAttempt(),
+                Timers?.StartSingleTimer("doublecheck", turnOff.NewAttempt(),
                     TimeSpan.FromMilliseconds(1000));
         }
 

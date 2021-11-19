@@ -1,6 +1,7 @@
 using Akka.Actor;
 using EventProcessingService.Messages.Commands;
 using EventProcessingService.Messages.Events;
+using EventProcessingService.Models;
 
 namespace EventProcessingService.Actors
 {
@@ -23,7 +24,8 @@ namespace EventProcessingService.Actors
             if (buttonStateChanged.ButtonId != "9") return;
             if (buttonStateChanged.EventId != 1002) return;
 
-            Context.ActorSelection("/user/lights").Tell(new TurnLightsOff());
+            Context.ActorSelection("/user/lights")
+                .Tell(new TurnLightsOff(new Selector(new[] { new Filter("id", "15") })));
         }
     }
 }
