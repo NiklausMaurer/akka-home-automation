@@ -20,22 +20,25 @@ namespace EventProcessingService.Actors
         {
             HttpClientFactory = httpClientFactory;
             
-            var lights = FetchLights(CancellationToken.None);
-            
-             foreach (var light in lights)
-             {
-                 if (light.Type.Equals("On/Off plug-in unit")) continue;
-                 if (light.Type.Equals("Configuration tool")) continue;
-            
+            var lightDtos = FetchLights(CancellationToken.None);
+
+            foreach (var light in lightDtos)
+            {
+                 var lightModel = new Models.Light(light.Id);
+                 if(light.Type.ToLower().Contains("light")) lightModel.AddLabel("type", "light");
+                 if(light.Type.ToLower().Contains("plug")) lightModel.AddLabel("type", "plug");
+                 LightModels.Add(lightModel);
+                 
                  var props = DependencyResolver.For(Context.System).Props<Light>(light.Id);
                  LightRefs[light.Id] = Context.ActorOf(props, $"light-{light.Id}");
-             }
+            }
 
             Receive<TurnLightsOn>(TurnLightsOn);
             Receive<TurnLightsOff>(TurnLightsOff);
         }
 
         private Dictionary<string, IActorRef> LightRefs { get; } = new();
+        private List<Models.Light> LightModels { get; } = new();
 
         public static Props Props(IHttpClientFactory httpClientFactory)
         {
@@ -44,17 +47,17 @@ namespace EventProcessingService.Actors
 
         private void TurnLightsOn(TurnLightsOn turnOn)
         {
-            foreach (var light in LightRefs)
+            foreach (var light in LightModels)
             {   
-                light.Value.Tell(new TurnOn());
+                if(light.HasLabel("type", "light")) LightRefs[light.Id].Tell(new TurnOn());
             }
         }
 
         private void TurnLightsOff(TurnLightsOff turnOff)
         {
-            foreach (var light in LightRefs)
-            {
-                light.Value.Tell(new TurnOff());
+            foreach (var light in LightModels)
+            {   
+                if(light.HasLabel("type", "light")) LightRefs[light.Id].Tell(new TurnOff());
             }
         }
         
