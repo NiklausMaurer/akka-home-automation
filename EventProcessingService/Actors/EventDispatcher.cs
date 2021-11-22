@@ -15,7 +15,7 @@ namespace EventProcessingService.Actors
         public EventDispatcher(ILogger<EventDispatcher> logger)
         {
             Logger = logger;
-            
+
             Receive<string>(message =>
             {
                 var incomingEvent = JObject.Parse(message).ToObject<IncomingEvent>();
@@ -29,15 +29,12 @@ namespace EventProcessingService.Actors
                 if (incomingEvent.State.ButtonEvent.HasValue)
                 {
                     var msg = new ButtonStateChanged(incomingEvent.ResourceId, incomingEvent.State.ButtonEvent.Value);
-                    var msgJson = JsonSerializer.Serialize(msg);
-                    
-                    logger.LogInformation("Publishing button event: {MsgJson}", msgJson);
-                    
+                    Logger.LogInformation("Publishing button event: {MsgJson}", JsonSerializer.Serialize(msg));
                     Context.System.EventStream.Publish(msg);
                 }
             });
         }
-        
+
         public static Props Props(ILogger<EventDispatcher> logger)
         {
             return Akka.Actor.Props.Create(() => new EventDispatcher(logger));
