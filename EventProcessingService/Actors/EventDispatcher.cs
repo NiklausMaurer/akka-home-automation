@@ -2,14 +2,20 @@ using System;
 using Akka.Actor;
 using EventProcessingService.Dto;
 using EventProcessingService.Messages.Events;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace EventProcessingService.Actors
 {
     public class EventDispatcher : ReceiveActor
     {
-        public EventDispatcher()
+        private ILogger<EventDispatcher> Logger { get; }
+
+        public EventDispatcher(ILogger<EventDispatcher> logger)
         {
+            Logger = logger;
+            
             Receive<string>(message =>
             {
                 var incomingEvent = JObject.Parse(message).ToObject<IncomingEvent>();
@@ -22,10 +28,19 @@ namespace EventProcessingService.Actors
 
                 if (incomingEvent.State.ButtonEvent.HasValue)
                 {
-                    Context.System.EventStream.Publish(new ButtonStateChanged(incomingEvent.ResourceId,
-                        incomingEvent.State.ButtonEvent.Value));
+                    var msg = new ButtonStateChanged(incomingEvent.ResourceId, incomingEvent.State.ButtonEvent.Value);
+                    var msgJson = JsonSerializer.Serialize(msg);
+                    
+                    logger.LogInformation("Publishing button event: {MsgJson}", msgJson);
+                    
+                    Context.System.EventStream.Publish(msg);
                 }
             });
+        }
+        
+        public static Props Props(ILogger<EventDispatcher> logger)
+        {
+            return Akka.Actor.Props.Create(() => new EventDispatcher(logger));
         }
     }
 }

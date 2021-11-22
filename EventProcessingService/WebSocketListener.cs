@@ -47,11 +47,13 @@ namespace EventProcessingService
             var di = DependencyResolverSetup.Create(ServiceProvider);
             var system = ActorSystem.Create("playground", BootstrapSetup.Create().And(di));
 
-            var eventDispatcher = system.ActorOf<EventDispatcher>("eventDispatcher");
+            var props = DependencyResolver.For(system).Props<EventDispatcher>();
+            var eventDispatcher = system.ActorOf(props, "eventDispatcher");
+            
             system.ActorOf(TurnAllLightsOffAutomation.Props());
             system.ActorOf(TurnAllLightsOnAutomation.Props());
 
-            var props = DependencyResolver.For(system).Props<Lights>();
+            props = DependencyResolver.For(system).Props<Lights>();
             system.ActorOf(props, "lights");
 
             Logger.Log(LogLevel.Trace, "Connecting to WebSocket");
