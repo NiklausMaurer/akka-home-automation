@@ -45,7 +45,7 @@ namespace EventProcessingService
             Logger.Log(LogLevel.Trace, "Initializing Actor System");
             
             var di = DependencyResolverSetup.Create(ServiceProvider);
-            var system = ActorSystem.Create("playground", BootstrapSetup.Create().And(di));
+            var system = ActorSystem.Create("akkaHomeAutomation", BootstrapSetup.Create().And(di));
 
             var props = DependencyResolver.For(system).Props<EventDispatcher>();
             var eventDispatcher = system.ActorOf(props, "eventDispatcher");
