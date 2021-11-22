@@ -21,8 +21,8 @@ namespace EventProcessingService.Actors
 
         private void ReceiveButtonEvent(ButtonStateChanged buttonStateChanged)
         {
-            if (buttonStateChanged.ButtonId != "9") return;
-            if (buttonStateChanged.EventId != 2002) return;
+            if (buttonStateChanged.ButtonId != "10") return;
+            if (buttonStateChanged.EventId != 1002) return;
 
             Context.ActorSelection("/user/lights")
                 .Tell(new TurnLightsOn(new Selector(new[] { new Filter("id", "15") })));
