@@ -4,7 +4,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace EventProcessingService
 {
-    public static class Program
+    public class Program
     {
         public static void Main(string[] args)
         {
@@ -14,12 +14,12 @@ namespace EventProcessingService
         private static IHostBuilder CreateHostBuilder(string[] args)
         {
             return Host.CreateDefaultBuilder(args)
-                .ConfigureServices((_, services) => { 
+                .ConfigureServices((context, services) => { 
                     services.AddHostedService<WebSocketListener>();
                     services.AddHttpClient("deconz", client =>
                     {
-                        client.BaseAddress = new Uri("http://192.168.88.203:9080/api/84594D24F2/");
-                        client.Timeout = TimeSpan.FromMilliseconds(100);
+                        client.BaseAddress = new Uri($"http://192.168.88.203:9080/api/{context.Configuration["deconz-api-key"]}/");
+                        client.Timeout = TimeSpan.FromMilliseconds(200);
                     });
                 });
         }
