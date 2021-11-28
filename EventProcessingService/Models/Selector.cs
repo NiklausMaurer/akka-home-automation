@@ -14,7 +14,7 @@ namespace EventProcessingService.Models
 
         public IEnumerable<Light> Select(IEnumerable<Light> lights)
         {
-            return Filters.Aggregate(lights, (current, filter) => filter.Apply(current));
+            return Filters.Aggregate(lights, (current, filter) => filter.ApplyTo(current));
         }
     }
 }

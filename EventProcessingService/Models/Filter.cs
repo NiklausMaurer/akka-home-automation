@@ -14,7 +14,7 @@ namespace EventProcessingService.Models
         private string Key { get; set; }
         private string Value { get; set; }
 
-        public IEnumerable<Light> Apply(IEnumerable<Light> lights)
+        public IEnumerable<Light> ApplyTo(IEnumerable<Light> lights)
         {
             return lights.Where(l => l.HasLabel(Key, Value));
         }
