@@ -18,7 +18,8 @@ namespace EventProcessingService
                     services.AddHostedService<WebSocketListener>();
                     services.AddHttpClient("deconz", client =>
                     {
-                        client.BaseAddress = new Uri($"http://192.168.88.203:9080/api/{context.Configuration["deconz-api-key"]}/");
+                        string apiKey = context.Configuration["deconz-api-key"];
+                        client.BaseAddress = new Uri($"http://192.168.88.203:9080/api/{apiKey}/");
                         client.Timeout = TimeSpan.FromMilliseconds(200);
                     });
                 });
