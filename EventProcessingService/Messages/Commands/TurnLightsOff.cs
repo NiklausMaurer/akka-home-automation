@@ -1,4 +1,4 @@
-using EventProcessingService.Models;
+using EventProcessingService.Messages.Commands.Shared;
 
 namespace EventProcessingService.Messages.Commands
 {

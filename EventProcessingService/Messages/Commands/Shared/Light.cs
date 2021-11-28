@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace EventProcessingService.Models
+namespace EventProcessingService.Messages.Commands.Shared
 {
     public class Light
     {

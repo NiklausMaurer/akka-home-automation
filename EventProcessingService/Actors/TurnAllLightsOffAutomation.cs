@@ -1,7 +1,7 @@
 using Akka.Actor;
 using EventProcessingService.Messages.Commands;
+using EventProcessingService.Messages.Commands.Shared;
 using EventProcessingService.Messages.Events;
-using EventProcessingService.Models;
 
 namespace EventProcessingService.Actors
 {

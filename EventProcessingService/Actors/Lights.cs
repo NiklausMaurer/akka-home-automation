@@ -24,7 +24,7 @@ namespace EventProcessingService.Actors
 
             foreach (var light in lightDtos)
             {
-                 var lightModel = new Models.Light(light.Id);
+                 var lightModel = new Messages.Commands.Shared.Light(light.Id);
                  lightModel.AddLabel("id", light.Id);
                  if(light.Type.ToLower().Contains("light")) lightModel.AddLabel("type", "light");
                  if(light.Type.ToLower().Contains("plug")) lightModel.AddLabel("type", "plug");
@@ -39,7 +39,7 @@ namespace EventProcessingService.Actors
         }
 
         private Dictionary<string, IActorRef> LightRefs { get; } = new();
-        private List<Models.Light> LightModels { get; } = new();
+        private List<Messages.Commands.Shared.Light> LightModels { get; } = new();
 
         public static Props Props(IHttpClientFactory httpClientFactory)
         {
