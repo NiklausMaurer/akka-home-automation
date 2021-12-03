@@ -59,11 +59,10 @@ namespace EventProcessingService
     
     public static class ActorSystemExtensions
     {
-        public static IActorRef CreateActor<T>(this ActorSystem system, string name = null) where T : ActorBase
+        public static IActorRef CreateActor<T>(this ActorSystem system, string name = null!) where T : ActorBase
         {
             var props = DependencyResolver.For(system).Props<T>();
-            var eventDispatcher = system.ActorOf(props, name);
-            return eventDispatcher;
+            return system.ActorOf(props, name);
         }
     }
 }
