@@ -41,8 +41,7 @@ namespace EventProcessingService
 
             Logger.Log(LogLevel.Trace, "Connecting to WebSocket");
             using var webSocket = new ClientWebSocket();
-            var cancellationTokenSource = new CancellationTokenSource();
-            await webSocket.ConnectAsync(new Uri("ws://192.168.88.203:443"), cancellationTokenSource.Token);
+            await webSocket.ConnectAsync(new Uri("ws://192.168.88.203:443"), stoppingToken);
 
             Logger.Log(LogLevel.Trace, "Connected. Starting to listen...");
             
@@ -51,7 +50,7 @@ namespace EventProcessingService
             
             while (!stoppingToken.IsCancellationRequested)
             {
-                var receiveResult = await webSocket.ReceiveAsync(memory, cancellationTokenSource.Token);
+                var receiveResult = await webSocket.ReceiveAsync(memory, stoppingToken);
                 var messageBytes = buffer.Take(receiveResult.Count).ToArray();
                 var message = Encoding.UTF8.GetString(messageBytes);
                 
