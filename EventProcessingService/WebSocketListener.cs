@@ -29,16 +29,12 @@ namespace EventProcessingService
             
             var di = DependencyResolverSetup.Create(ServiceProvider);
             var system = ActorSystem.Create("akkaHomeAutomation", BootstrapSetup.Create().And(di));
-
-            var props = DependencyResolver.For(system).Props<EventDispatcher>();
-            var eventDispatcher = system.ActorOf(props, "eventDispatcher");
+            system.CreateActor<TurnAllLightsOffAutomation>();
+            system.CreateActor<TurnAllLightsOnAutomation>();
+            system.CreateActor<Lights>("lights");
             
-            system.ActorOf(TurnAllLightsOffAutomation.Props());
-            system.ActorOf(TurnAllLightsOnAutomation.Props());
-
-            props = DependencyResolver.For(system).Props<Lights>();
-            system.ActorOf(props, "lights");
-
+            var eventDispatcher = system.CreateActor<EventDispatcher>("eventDispatcher");
+            
             Logger.Log(LogLevel.Trace, "Connecting to WebSocket");
             using var webSocket = new ClientWebSocket();
             await webSocket.ConnectAsync(new Uri("ws://192.168.88.203:443"), stoppingToken);
@@ -58,6 +54,16 @@ namespace EventProcessingService
             }
 
             await system.Terminate();
+        }
+    }
+    
+    public static class ActorSystemExtensions
+    {
+        public static IActorRef CreateActor<T>(this ActorSystem system, string name = null) where T : ActorBase
+        {
+            var props = DependencyResolver.For(system).Props<T>();
+            var eventDispatcher = system.ActorOf(props, name);
+            return eventDispatcher;
         }
     }
 }
