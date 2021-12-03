@@ -35,12 +35,7 @@ namespace EventProcessingService
             
             var eventDispatcher = system.CreateActor<EventDispatcher>("eventDispatcher");
             
-            Logger.Log(LogLevel.Trace, "Connecting to WebSocket");
-            using var webSocket = new ClientWebSocket();
-            await webSocket.ConnectAsync(new Uri("ws://192.168.88.203:443"), stoppingToken);
-
-            Logger.Log(LogLevel.Trace, "Connected. Starting to listen...");
-            
+            var webSocket = await CreateWebSocket(stoppingToken);
             var buffer = new byte[2048];
             var memory = new Memory<byte>(buffer);
             
@@ -54,6 +49,16 @@ namespace EventProcessingService
             }
 
             await system.Terminate();
+        }
+
+        private async Task<ClientWebSocket> CreateWebSocket(CancellationToken stoppingToken)
+        {
+            Logger.Log(LogLevel.Trace, "Connecting to WebSocket");
+            using var webSocket = new ClientWebSocket();
+            await webSocket.ConnectAsync(new Uri("ws://192.168.88.203:443"), stoppingToken);
+
+            Logger.Log(LogLevel.Trace, "Connected. Starting to listen...");
+            return webSocket;
         }
     }
     
