@@ -9,26 +9,9 @@ using Akka.DependencyInjection;
 using EventProcessingService.Actors;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
 namespace EventProcessingService
 {
-    public class LightDto
-    {
-        public LightDto(string id, string name, string type)
-        {
-            Id = id;
-            Name = name;
-            Type = type;
-        }
-
-        [JsonIgnore] public string Id { get; set; }
-
-        [JsonProperty("name")] public string Name { get; set; }
-
-        [JsonProperty("type")] public string Type { get; set; }
-    }
-
     public class WebSocketListener : BackgroundService
     {
         public WebSocketListener(IServiceProvider serviceProvider, ILogger<WebSocketListener> logger)

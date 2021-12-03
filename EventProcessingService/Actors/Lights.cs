@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Threading;
 using Akka.Actor;
 using Akka.DependencyInjection;
+using EventProcessingService.Dto;
 using EventProcessingService.Messages.Commands;
 using Newtonsoft.Json.Linq;
 
