@@ -2,6 +2,7 @@ using System;
 using Akka.Actor;
 using Akka.DependencyInjection;
 using EventProcessingService.Actors;
+using EventProcessingService.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

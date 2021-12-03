@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Akka.Actor;
-using Akka.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace EventProcessingService
@@ -35,15 +34,6 @@ namespace EventProcessingService
             }
 
             await ActorSystem.Terminate();
-        }
-    }
-    
-    public static class ActorSystemExtensions
-    {
-        public static void CreateActor<T>(this ActorSystem system, string name = null!) where T : ActorBase
-        {
-            var props = DependencyResolver.For(system).Props<T>();
-            system.ActorOf(props, name);
         }
     }
 }
