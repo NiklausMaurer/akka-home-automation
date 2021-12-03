@@ -56,6 +56,8 @@ namespace EventProcessingService
                 
                 eventDispatcher.Tell(message);
             }
+
+            await system.Terminate();
         }
     }
 }
